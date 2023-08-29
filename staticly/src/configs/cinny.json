@@ -1,0 +1,18 @@
+{
+    "defaultHomeserver": 0,
+    "homeserverList": [
+      "nue.soopy.moe",
+      "nue-staging.soopy.moe",
+      "matrix.org",
+      "chat.mozilla.org"
+    ],
+    "default_server_name": "nue.soopy.moe",
+    "room_directory": {
+      "servers": [
+        "nue.soopy.moe",
+        "nue-staging.soopy.moe",
+        "matrix.org"
+      ]
+    }
+  }
+  
