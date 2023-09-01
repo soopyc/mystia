@@ -1,6 +1,6 @@
-{ pkgs, ... }:
+{ stdenvNoCC }:
 
-pkgs.stdenv.mkDerivation {
+stdenvNoCC.mkDerivation {
   name = "staticly";
   src = ./src;
 
