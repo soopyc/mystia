@@ -27,7 +27,7 @@ jobs:
           pr-labels: |
             dependencies
             automated
-          sign-commits: true
-          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-          gpg-fingerprint: ${{ vars.GPG_FINGERPRINT }}
-          gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          git-author-name: soopyc [bot]
+          git-author-email: ci_signing+github@ningenkai.soopy.moe
+          git-committer-name: soopyc [bot]
+          git-committer-email: ci_signing+github@ningenkai.soopy.moe
