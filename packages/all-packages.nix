@@ -4,14 +4,12 @@
 final: prev: let
   callPackage = final.callPackage or (prev.lib.callPackageWith (prev // packages));
 
-  pkgs =
-    if (final != {}) 
-      then final
-      else prev;
+  pkgs = if (final != {})
+    then final
+    else prev;
 
   packages = {
     staticly = callPackage ./staticly {};
-    # nimPackages = pkgs.nimPackages.override;
-  };
+  } // (import ./nim-packages pkgs);
 in
   packages
