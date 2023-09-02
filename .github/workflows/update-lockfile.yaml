@@ -27,3 +27,7 @@ jobs:
           pr-labels: |
             dependencies
             automated
+          sign-commits: true
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-fingerprint: ${{ vars.GPG_FINGERPRINT }}
+          gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
