@@ -1,4 +1,4 @@
-[![Garnix CI build status](https://img.shields.io/endpoint?url=https%3A%2F%2Fgarnix.io%2Fapi%2Fbadges%2Fsoopyc%2Fmystia%3Fbranch%3Dmistress&label=Garnix%20CI)](https://opencollective.com/garnix_io)
+[![Garnix CI build status](https://img.shields.io/endpoint?url=https%3A%2F%2Fgarnix.io%2Fapi%2Fbadges%2Fsoopyc%2Fmystia%3Fbranch%3Dmistress&label=Garnix%20CI&color=%2300AAFF)](https://opencollective.com/garnix_io)
 
 <hr/>
 
