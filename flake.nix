@@ -1,13 +1,11 @@
 {
   description = "Just a bunch of packages";
 
-  nixConfig = rec {
-    extra-trusted-substituters = [
+  nixConfig = {
+    extra-substituters = [
       "https://nonbunary.soopy.moe/gensokyo-global"
       "https://cache.garnix.io"
     ];
-
-    extra-substituters = extra-trusted-substituters;
 
     extra-trusted-public-keys = [
       "gensokyo-global:XiCN0D2XeSxF4urFYTprR+1Nr/5hWyydcETwZtPG6Ec="
