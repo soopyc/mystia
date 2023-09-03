@@ -2,6 +2,9 @@
 
 just a bunch of packages.
 
+## what's inside?
+run `nix flake show github:soopyc/mystia`
+
 ## usage
 slide `github:soopyc/mystia` into your flake inputs like so
 ```nix
