@@ -17,6 +17,6 @@ nimPackages.buildNimPackage rec {
     downloadPage = src.url;
     description = "SHA-1 hashing library for Nim";
     license = lib.licenses.mit;  # the author did something to it so i'm not exactly sure, but the previous ver. is mit.
-    maintainers = [ ];
+    maintainers = [ (import ../../maintainers/soopyc.nix) ];
   };
 }

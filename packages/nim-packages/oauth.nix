@@ -21,6 +21,6 @@ nimPackages.buildNimPackage rec {
     downloadPage = src.url;
     description = "OAuth library for nim";
     license = lib.licenses.asl20;
-    maintainers = [ ];
+    maintainers = [ (import ../../maintainers/soopyc.nix) ];
   };
 }
