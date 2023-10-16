@@ -31,5 +31,9 @@
     in {
       packages.x86_64-linux = import ./packages/all-packages.nix {} pkgs;
       overlays.default = import ./packages/all-packages.nix;
+
+      nixosModules = {
+        fixups = import ./modules/fixups;
+      };
     };
 }
