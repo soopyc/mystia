@@ -337,7 +337,6 @@ in
         wantedBy = [ "multi-user.target" ];
         wants = [ "network-online.target" ];
         after = [ "network-online.target" ];
-        preStart = "${preStart}";
         serviceConfig = {
           DynamicUser = true;
           StateDirectory = "nitter";
@@ -346,6 +345,7 @@ in
           # see https://github.com/zedeus/nitter/issues/414
           WorkingDirectory = "${cfg.package}/share/nitter";
           ExecStart = "${cfg.package}/bin/nitter";
+          ExecStartPre = ["${preStart}"];
           AmbientCapabilities = lib.mkIf (cfg.server.port < 1024) [ "CAP_NET_BIND_SERVICE" ];
           Restart = "on-failure";
           RestartSec = "5s";
