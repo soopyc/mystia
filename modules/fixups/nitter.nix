@@ -4,7 +4,7 @@
 with lib;
 
 let
-  cfg = config.services.nitter;
+  cfg = config.services.nitterPatched;
   configFile = pkgs.writeText "nitter.conf" ''
     ${generators.toINI {
       # String values need to be quoted
@@ -48,7 +48,7 @@ in
 {
   imports = [
     # https://github.com/zedeus/nitter/pull/772
-    (mkRemovedOptionModule [ "services" "nitter" "replaceInstagram" ] "Nitter no longer supports this option as Bibliogram has been discontinued.")
+    (mkRemovedOptionModule [ "services" "nitterPatched" "replaceInstagram" ] "Nitter no longer supports this option as Bibliogram has been discontinued.")
   ];
 
   options = {
@@ -92,7 +92,7 @@ in
         staticDir = mkOption {
           type = types.path;
           default = "${cfg.package}/share/nitter/public";
-          defaultText = literalExpression ''"''${config.services.nitter.package}/share/nitter/public"'';
+          defaultText = literalExpression ''"''${config.services.nitterPatched.package}/share/nitter/public"'';
           description = lib.mdDoc "Path to the static files directory.";
         };
 
@@ -328,7 +328,7 @@ in
     assertions = [
       {
         assertion = !cfg.redisCreateLocally || (cfg.cache.redisHost == "localhost" && cfg.cache.redisPort == 6379);
-        message = "When services.nitter.redisCreateLocally is enabled, you need to use localhost:6379 as a cache server.";
+        message = "When services.nitterPatched.redisCreateLocally is enabled, you need to use localhost:6379 as a cache server.";
       }
     ];
 
