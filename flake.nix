@@ -22,18 +22,24 @@
     };
   };
 
-  outputs = { self, nixpkgs, ... }: # @inputs:
-    let
-      system = "x86_64-linux";
-      pkgs = import nixpkgs {
-        inherit system;
-      };
-    in {
-      packages.x86_64-linux = import ./packages/all-packages.nix {} pkgs;
-      overlays.default = import ./packages/all-packages.nix;
-
-      nixosModules = {
-        fixups = import ./modules/fixups;
-      };
+  outputs = {
+    self,
+    nixpkgs,
+    ...
+  }:
+  # @inputs:
+  let
+    system = "x86_64-linux";
+    pkgs = import nixpkgs {
+      inherit system;
     };
+  in {
+    packages.x86_64-linux = import ./packages/all-packages.nix {} pkgs;
+    overlays.default = import ./packages/all-packages.nix;
+    formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.alejandra;
+
+    nixosModules = {
+      fixups = import ./modules/fixups;
+    };
+  };
 }

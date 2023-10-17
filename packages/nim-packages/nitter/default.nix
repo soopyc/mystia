@@ -1,14 +1,13 @@
 # via https://github.com/NixOS/nixpkgs/blob/nixos-23.05/pkgs/servers/nitter/default.nix
-
-{ lib
-, oauthPackage ? nimPackages.oauth
-, fetchFromGitHub
-, nimPackages
-, nixosTests
-, substituteAll
-, unstableGitUpdater
+{
+  lib,
+  oauthPackage ? nimPackages.oauth,
+  fetchFromGitHub,
+  nimPackages,
+  nixosTests,
+  substituteAll,
+  unstableGitUpdater,
 }:
-
 nimPackages.buildNimPackage rec {
   pname = "nitter";
   version = "experimental-2023-09-19+guest_accounts";
@@ -25,7 +24,7 @@ nimPackages.buildNimPackage rec {
       src = ./nitter-version.patch;
       inherit version;
       inherit (src) rev;
-      url = builtins.replaceStrings [ "archive" ".tar.gz" ] [ "commit" "" ] src.url;
+      url = builtins.replaceStrings ["archive" ".tar.gz"] ["commit" ""] src.url;
     })
   ];
 
@@ -58,7 +57,7 @@ nimPackages.buildNimPackage rec {
   '';
 
   passthru = {
-    tests = { inherit (nixosTests) nitter; };
+    tests = {inherit (nixosTests) nitter;};
     updateScript = unstableGitUpdater {};
   };
 
@@ -66,7 +65,7 @@ nimPackages.buildNimPackage rec {
     homepage = "https://github.com/zedeus/nitter";
     description = "Alternative Twitter front-end";
     license = licenses.agpl3Only;
-    maintainers = with maintainers; [ erdnaxe infinidoge (import ../../maintainers/soopyc.nix)];
+    maintainers = with maintainers; [erdnaxe infinidoge (import ../../maintainers/soopyc.nix)];
     mainProgram = "nitter";
   };
 }

@@ -1,6 +1,10 @@
 # copied and adapted from https://github.com/NixOS/nixpkgs/blob/nixos-23.05/pkgs/development/nim-packages/jsony/default.nix
-{ lib, nimPackages, sha1Package ? nimPackages.sha1, fetchFromGitHub }:
-
+{
+  lib,
+  nimPackages,
+  sha1Package ? nimPackages.sha1,
+  fetchFromGitHub,
+}:
 nimPackages.buildNimPackage rec {
   pname = "oauth";
   version = "b8c163b0d9cfad6d29ce8c1fb394e5f47182ee1c";
@@ -21,6 +25,6 @@ nimPackages.buildNimPackage rec {
     downloadPage = src.url;
     description = "OAuth library for nim";
     license = lib.licenses.asl20;
-    maintainers = [ (import ../../maintainers/soopyc.nix) ];
+    maintainers = [(import ../../maintainers/soopyc.nix)];
   };
 }

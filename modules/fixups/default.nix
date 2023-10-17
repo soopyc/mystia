@@ -1,4 +1,4 @@
-{ ... }: {
+{...}: {
   imports = [
     ./nitter.nix
   ];
