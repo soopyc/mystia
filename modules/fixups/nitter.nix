@@ -71,7 +71,7 @@ in {
         description = lib.mdDoc "The user account that nitter is ran with.";
       };
 
-      gruop = mkOption {
+      group = mkOption {
         type = types.str;
         default = "nitter";
         description = lib.mdDoc "The group that nitter is ran with.";
