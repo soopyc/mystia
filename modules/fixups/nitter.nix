@@ -65,6 +65,18 @@ in {
         description = lib.mdDoc "The nitter derivation to use.";
       };
 
+      user = mkOption {
+        type = types.str;
+        default = "nitter";
+        description = lib.mdDoc "The user account that nitter is ran with.";
+      };
+
+      gruop = mkOption {
+        type = types.str;
+        default = "nitter";
+        description = lib.mdDoc "The group that nitter is ran with.";
+      };
+
       server = {
         address = mkOption {
           type = types.str;
@@ -335,13 +347,26 @@ in {
       }
     ];
 
+    users = {
+      users = optionalAttrs (cfg.user == "nitter") {
+        nitter = {
+          group = cfg.group;
+          isSystemUser = true;
+        };
+      };
+
+      groups = optionalAttrs (cfg.group == "nitter") {nitter = {};};
+    };
+
     systemd.services.nitter = {
       description = "Nitter (An alternative Twitter front-end)";
       wantedBy = ["multi-user.target"];
       wants = ["network-online.target"];
       after = ["network-online.target"];
       serviceConfig = {
-        DynamicUser = true;
+        DynamicUser = false; # HACK: this is required to pass in large secrets. PR if you have a better way.
+        User = cfg.user;
+        Group = cfg.group;
         StateDirectory = "nitter";
         Environment = ["NITTER_CONF_FILE=/var/lib/nitter/nitter.conf"];
         # Some parts of Nitter expect `public` folder in working directory,
