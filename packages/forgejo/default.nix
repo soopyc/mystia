@@ -3,7 +3,7 @@
 { bash
 , brotli
 , buildGo121Module
-, forgejo
+, forgejo-unstable
 , git
 , gzip
 , lib
@@ -24,9 +24,9 @@
 let
   frontend = buildNpmPackage {
     pname = "forgejo-frontend";
-    inherit (forgejo) src version;
+    inherit (forgejo-unstable) src version;
 
-    npmDepsHash = "sha256-YZzVw+WWqTmJafqnZ5vrzb7P6V4DTMNQwW1/+wvZEM8=";
+    npmDepsHash = "sha256-7ruJczJ2cE51UmoER8C3JsGm0p3RTwfqKx0eErB7LZs=";
 
     patches = [
       ./package-json-npm-build-frontend.patch
@@ -49,7 +49,7 @@ buildGo121Module rec {  # FIXME: ideally we would use a function to override stu
     owner = "forgejo";
     repo = "forgejo";
     rev = _commit;
-    hash = "";
+    hash = "sha256-s0lJhqO7ikdg1LtP2eJB+BDYxhHUNvMdPAP3mrSL2IU=";
   };
 
   vendorHash = "sha256-pBkQP9TcDGsxWwky05PLI59ERgXgg4s8CljeBxFVx6g=";
@@ -106,7 +106,7 @@ buildGo121Module rec {  # FIXME: ideally we would use a function to override stu
       nativeBuildInputs = [ brotli xorg.lndir ];
     } ''
       mkdir $out
-      lndir ${forgejo.data}/ $out/
+      lndir ${forgejo-unstable.data}/ $out/
 
       # Create static gzip and brotli files
       find -L $out -type f -regextype posix-extended -iregex '.*\.(css|html|js|svg|ttf|txt)' \
@@ -124,7 +124,7 @@ buildGo121Module rec {  # FIXME: ideally we would use a function to override stu
     changelog = "https://codeberg.org/forgejo/forgejo/compare/${_commit}...v1.20.5-0";
     # changelog = "https://codeberg.org/forgejo/forgejo/releases/tag/${src.rev}";
     license = lib.licenses.mit;
-    maintainers = with lib.maintainers; [ emilylange urandom bendlas adamcstephens ];
+    maintainers = with lib.maintainers; [ emilylange urandom bendlas adamcstephens (import ../maintainers/soopyc.nix) ];
     broken = stdenv.isDarwin;
     mainProgram = "gitea";
   };
