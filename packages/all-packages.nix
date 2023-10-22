@@ -11,6 +11,7 @@ final: prev: let
   packages =
     {
       staticly = callPackage ./staticly {};
+      forgejo-unstable = callPackage ./forgejo {};
     }
     // (import ./nim-packages pkgs);
 in
