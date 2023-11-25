@@ -10,13 +10,13 @@
 }:
 nimPackages.buildNimPackage rec {
   pname = "nitter";
-  version = "experimental-2023-11-14+guest_accounts";
+  version = "experimental-2023-11-25+guest_accounts";
 
   src = fetchFromGitHub {
     owner = "zedeus";
     repo = "nitter";
-    rev = "06ab1ea2e7341a239447e0ca7d1e9c6246b896c6";
-    hash = "sha256-mm8APTsX1cLDtCiJK2RK5sXFAyWT0yhyKpvrXqF4AWE=";
+    rev = "a9740fec8b2d9d4469322cc66d3f3547e0b6ccdb";
+    hash = "sha256-tE2lgM4ANBqqOaTPM8StxZigupG+ZZstck5xrYvKiJk=";
   };
 
   patches = [
