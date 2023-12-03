@@ -15,8 +15,8 @@ nimPackages.buildNimPackage rec {
   src = fetchFromGitHub {
     owner = "zedeus";
     repo = "nitter";
-    rev = "a9740fec8b2d9d4469322cc66d3f3547e0b6ccdb";
-    hash = "sha256-tE2lgM4ANBqqOaTPM8StxZigupG+ZZstck5xrYvKiJk=";
+    rev = "583c858cdf3486451ed6a0627640844f27009dbe";
+    hash = "sha256-3E6nfmOFhQ2bjwGMWdTmZ38Fg/SE36s6fxYDXwSJaTw=";
   };
 
   patches = [
