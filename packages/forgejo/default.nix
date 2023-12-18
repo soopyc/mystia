@@ -40,7 +40,7 @@
 in
   buildGo121Module rec {
     # FIXME: ideally we would use a function to override stuff as described in https://nixos.org/manual/nixpkgs/unstable/#mkderivation-recursive-attributes. However, buildGoModule does not yet support this as of this commit.
-    pname = "forgejo-unstable";
+    pname = "forgejoUnstable";
     _commit = "10af67d8e5d063d17330293f8141b436dd832b27";
     version = "1.21.1-dev-${builtins.substring 0 7 _commit}";
 
