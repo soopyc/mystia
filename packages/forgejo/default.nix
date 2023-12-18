@@ -41,18 +41,19 @@ in
   buildGo121Module rec {
     # FIXME: ideally we would use a function to override stuff as described in https://nixos.org/manual/nixpkgs/unstable/#mkderivation-recursive-attributes. However, buildGoModule does not yet support this as of this commit.
     pname = "forgejoUnstable";
-    _commit = "10af67d8e5d063d17330293f8141b436dd832b27";
-    version = "1.21.1-dev-${builtins.substring 0 7 _commit}";
+    _commit = "a94488cc989f48a5bc4418c1136e760a4871f9d1";
+    version = "1.21.2-dev-${builtins.substring 0 7 _commit}";
 
     src = fetchFromGitea {
       domain = "codeberg.org";
       owner = "forgejo";
       repo = "forgejo";
       rev = _commit;
-      hash = "sha256-BqkGYJ+yRrpjhY9iOhLPjlKjKWrugn+As1C/CTVq5hU=";
+      hash = "sha256-e5pHF/5HNR9v6tgLMzm6tQ4e1JwEqmJjrHyBkh7c4PE=";
     };
-
+    # TODO: vendor hash
     vendorHash = "sha256-+/wOEF44dSqy7ZThZyd66xyI3wVnFwZbsAd4ujyVku8=";
+
 
     subPackages = ["."];
 
