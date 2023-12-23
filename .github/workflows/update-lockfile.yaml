@@ -31,3 +31,8 @@ jobs:
           git-author-email: ci_signing+github@ningenkai.soopy.moe
           git-committer-name: soopyc [bot]
           git-committer-email: ci_signing+github@ningenkai.soopy.moe
+
+          sign-commits: true
+          gpg-fingerprint: ${{ vars.GPG_FINGERPRINT }}
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
