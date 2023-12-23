@@ -3,8 +3,8 @@ pull_request_rules:
     conditions:
       - "base=mistress"
       - "-#commits-unverified>0"
-      - check-success=*
-      - commits[*].email_author = ci_signing+github@ningenkai.soopy.moe
+      - "check-success > 0"
+      - "commits[*].email_author = ci_signing+github@ningenkai.soopy.moe"
       - "label=automated"
       - "label=dependencies"
       - "-closed"
