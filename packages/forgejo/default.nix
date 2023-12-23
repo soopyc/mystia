@@ -49,10 +49,10 @@ in
       owner = "forgejo";
       repo = "forgejo";
       rev = _commit;
-      hash = "";
+      hash = "sha256-wLFSHKLf5ZCGjq4ed/QnUDD7nw3A4WQtNId9UyP3nWg=";
     };
     # TODO: vendor hash
-    vendorHash = "";
+    vendorHash = "sha256-eJUDLUzjuot/zpL5ln/0K/t8jGC3uCwJCjoXQww8hTM=";
 
 
     subPackages = ["."];
