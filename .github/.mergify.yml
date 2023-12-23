@@ -1,0 +1,13 @@
+pull_request_rules:
+  - name: Automatically merge flake update PRs
+    conditions:
+      - "base=mistress"
+      - "-#commits-unverified>0"
+      - check-success=*
+      - commits[*].email_author = ci_signing+github@ningenkai.soopy.moe
+      - "label=automated"
+      - "label=dependencies"
+      - "-closed"
+    actions:
+      merge:
+        method: fast-forward
