@@ -4,7 +4,7 @@
   bash,
   brotli,
   buildGo121Module,
-  forgejo-unstable,
+  forgejoUnstable,
   git,
   gzip,
   lib,
@@ -23,7 +23,7 @@
 }: let
   frontend = buildNpmPackage {
     pname = "forgejo-frontend";
-    inherit (forgejo-unstable) src version;
+    inherit (forgejoUnstable) src version;
 
     npmDepsHash = "sha256-yBCVqPpeRKFF+4YZq2er7yASk1aLlFbE52SqVVFrsGI=";
 
@@ -41,7 +41,7 @@ in
   buildGo121Module rec {
     # FIXME: ideally we would use a function to override stuff as described in https://nixos.org/manual/nixpkgs/unstable/#mkderivation-recursive-attributes. However, buildGoModule does not yet support this as of this commit.
     pname = "forgejoUnstable";
-    _commit = "a94488cc989f48a5bc4418c1136e760a4871f9d1";
+    _commit = "cdd452e4f918023f58c83448adce45a66755d712";
     version = "1.21.2-dev-${builtins.substring 0 7 _commit}";
 
     src = fetchFromGitea {
@@ -49,10 +49,10 @@ in
       owner = "forgejo";
       repo = "forgejo";
       rev = _commit;
-      hash = "sha256-e5pHF/5HNR9v6tgLMzm6tQ4e1JwEqmJjrHyBkh7c4PE=";
+      hash = "";
     };
     # TODO: vendor hash
-    vendorHash = "sha256-+/wOEF44dSqy7ZThZyd66xyI3wVnFwZbsAd4ujyVku8=";
+    vendorHash = "";
 
 
     subPackages = ["."];
@@ -109,7 +109,7 @@ in
           nativeBuildInputs = [brotli xorg.lndir];
         } ''
           mkdir $out
-          lndir ${forgejo-unstable.data}/ $out/
+          lndir ${forgejoUnstable.data}/ $out/
 
           # Create static gzip and brotli files
           find -L $out -type f -regextype posix-extended -iregex '.*\.(css|html|js|svg|ttf|txt)' \
