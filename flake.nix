@@ -34,9 +34,9 @@
       inherit system;
     };
   in {
-    packages.x86_64-linux = import ./packages/all-packages.nix {} pkgs;
+    packages.${system} = import ./packages/all-packages.nix {} pkgs;
     overlays.default = import ./packages/all-packages.nix;
-    formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.alejandra;
+    formatter.${system} = nixpkgs.legacyPackages.${system}.alejandra;
 
     nixosModules = {
       fixups = import ./modules/fixups;
