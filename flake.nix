@@ -3,6 +3,10 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
+    nix-update-soopy = {
+      url = "github:soopyc/nix-update";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     flake-compat = {
       url = "github:edolstra/flake-compat";
@@ -26,9 +30,7 @@
     self,
     nixpkgs,
     ...
-  }:
-  # @inputs:
-  let
+  } @ inputs: let
     system = "x86_64-linux";
     pkgs = import nixpkgs {
       inherit system;
@@ -37,6 +39,12 @@
     packages.${system} = import ./packages/all-packages.nix {} pkgs;
     overlays.default = import ./packages/all-packages.nix;
     formatter.${system} = nixpkgs.legacyPackages.${system}.alejandra;
+
+    devShells.${system}.default = pkgs.mkShellNoCC {
+      packages = [
+        inputs.nix-update-soopy.packages.${system}.default
+      ];
+    };
 
     nixosModules = {
       fixups = import ./modules/fixups;
