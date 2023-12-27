@@ -7,12 +7,11 @@ final: prev: let
     then final
     else prev;
 
-  packages =
-    {
-      staticly = callPackage ./staticly {};
-      forgejo-unstable = pkgs.lib.warn "the forgejo-unstable package is deprecated, please use forgejoUnstable instead." callPackage ./forgejo {};
-      forgejoUnstable = callPackage ./forgejo {};
-      nitterExperimental = callPackage ./nitter {};
-    };
+  packages = {
+    staticly = callPackage ./staticly {};
+    forgejo-unstable = pkgs.lib.warn "the forgejo-unstable package is deprecated, please use forgejoUnstable instead." callPackage ./forgejo {};
+    forgejoUnstable = callPackage ./forgejo {};
+    nitterExperimental = callPackage ./nitter {};
+  };
 in
   packages
