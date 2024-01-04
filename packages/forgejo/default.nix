@@ -25,7 +25,7 @@
     pname = "forgejo-frontend";
     inherit (forgejoUnstable) src version;
 
-    npmDepsHash = "sha256-tdNcR9hMvwtTX+o97YRouLAqOrFq9/mYH/nwkGmOFGE=";
+    npmDepsHash = "sha256-fGvf6bLA9/cCKucj0oQCZC86lnvvEqqHKHnkiCc7bT0=";
 
     patches = [
       ./package-json-npm-build-frontend.patch
@@ -39,11 +39,11 @@
   };
 in
   buildGo121Module rec {
-    vendorHash = "sha256-FOWD20GMjTonPge07YexBDxQNU9+Zm2x8pGv3jgsVWU=";
+    vendorHash = "sha256-EDYtyF9vQrxhdhMFnYl/Ut6syZl5ufGddXUHHKOPzfs=";
 
     # FIXME: ideally we would use a function to override stuff as described in https://nixos.org/manual/nixpkgs/unstable/#mkderivation-recursive-attributes. However, buildGoModule does not yet support this as of this commit.
     pname = "forgejoUnstable";
-    _commit = "c98322ed9c877a9bf717f22c4035d3fc45a5ea54";
+    _commit = "21beb7e437e240bc2e5d8a967ba18b8c65112395";
     version = "1.21.3-dev-${builtins.substring 0 7 _commit}";
 
     src = fetchFromGitea {
@@ -51,7 +51,7 @@ in
       owner = "forgejo";
       repo = "forgejo";
       rev = _commit;
-      hash = "sha256-ClEt8d67YGo5jCiq140j4DtQpiPtCRqOzmnUG4B7UJY=";
+      hash = "sha256-f/6la3RkqV+Pcepjyc0/4kMVG2+soJR7906BW4lR/AU=";
     };
 
     subPackages = ["."];
