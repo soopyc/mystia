@@ -10,7 +10,6 @@ pull_request_rules:
       - "commits[*].email_author = ci_signing+github@ningenkai.soopy.moe"
       - "label=automated"
       - "label=dependencies"
-      - "-closed"
     actions:
       delete_head_branch:
         force: false
