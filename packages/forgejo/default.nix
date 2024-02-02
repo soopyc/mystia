@@ -43,7 +43,7 @@ in
 
     # FIXME: ideally we would use a function to override stuff as described in https://nixos.org/manual/nixpkgs/unstable/#mkderivation-recursive-attributes. However, buildGoModule does not yet support this as of this commit.
     pname = "forgejoUnstable";
-    _commit = "62ef90030f82d00dea5609e0a2ed4512315e9611";
+    _commit = "623f13f2dc7ac56c45cc6a8d4b8aa82c2a29e191";
     version = "1.21.5-dev-${builtins.substring 0 7 _commit}";
 
     src = fetchFromGitea {
@@ -51,7 +51,7 @@ in
       owner = "forgejo";
       repo = "forgejo";
       rev = _commit;
-      hash = "sha256-n+cp48ubqWH5hWRwzJAI4DrO7Jm+jgewzzUhI100LvA=";
+      hash = "sha256-WiU+0XI/Jcvo2WSjxboOLBfVJqj+ALsztroPNq43Jrk=";
     };
 
     subPackages = ["."];
