@@ -48,6 +48,7 @@
 
     nixosModules = {
       fixups = import ./modules/fixups;
+      vmauth = import ./modules/vmauth;
     };
   };
 }
