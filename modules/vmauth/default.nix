@@ -71,4 +71,6 @@ in {
       };
     };
   };
+
+  meta.maintainers = with lib.maintainers; [soopyc];
 }

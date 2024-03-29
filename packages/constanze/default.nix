@@ -1,4 +1,5 @@
 {
+  lib,
   buildGoModule,
   fetchFromGitea,
 }:
@@ -18,6 +19,6 @@ buildGoModule {
   meta = {
     description = "Simple CLI tool to tinker with akkoma instances";
     homepage = "https://akkoma.dev/AkkomaGang/constanze";
-    maintainers = [(import ../maintainers/soopyc.nix)];
+    maintainers = with lib.maintainers; [soopyc];
   };
 }

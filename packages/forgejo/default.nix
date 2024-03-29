@@ -126,7 +126,7 @@ in
       changelog = "https://codeberg.org/forgejo/forgejo/compare/${_commit}...v1.20.5-0";
       # changelog = "https://codeberg.org/forgejo/forgejo/releases/tag/${src.rev}";
       license = lib.licenses.mit;
-      maintainers = with lib.maintainers; [emilylange urandom bendlas adamcstephens (import ../maintainers/soopyc.nix)];
+      maintainers = with lib.maintainers; [emilylange urandom bendlas adamcstephens soopyc];
       broken = stdenv.isDarwin;
       mainProgram = "gitea";
     };
