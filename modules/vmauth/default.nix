@@ -53,6 +53,7 @@ in {
       description = "vmauth - Simple authentication proxy for VictoriaMetrics components";
       after = ["network.target"];
       startLimitBurst = 5;
+      wantedBy = ["multi-user.target"];
 
       serviceConfig = {
         Restart = "on-failure";
