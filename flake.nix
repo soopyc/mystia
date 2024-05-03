@@ -49,6 +49,7 @@
     nixosModules = {
       fixups = import ./modules/fixups;
       vmauth = import ./modules/vmauth;
+      arrpc = import ./modules/arrpc;
     };
   };
 }
