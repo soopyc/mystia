@@ -22,6 +22,9 @@ in
       serviceConfig = {
         ExecStart = lib.getExe cfg.package;
 
+        Restart = "on-failure";
+        RestartSec = 5;
+
         # Hardening - not sure how many of these are superfluous.
         PrivateTmp = true;
         PrivateUsers = true;
