@@ -4,7 +4,7 @@
 
 # mystia
 
-just a bunch of packages.
+just a bunch of packages, and a sandbox for stuff that we might upstream later.
 
 ## what's inside?
 run `nix flake show github:soopyc/mystia`
