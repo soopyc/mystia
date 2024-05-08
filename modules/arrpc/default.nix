@@ -3,14 +3,12 @@
   config,
   pkgs,
   ...
-}:
-let
+}: let
   cfg = config.services.arrpc;
-in
-{
+in {
   options.services.arrpc = {
     enable = lib.mkEnableOption "a Discord RPC bridge for atypical setups";
-    package = lib.mkPackageOption pkgs "arrpc" { };
+    package = lib.mkPackageOption pkgs "arrpc" {};
   };
 
   config = lib.mkIf cfg.enable {
@@ -45,9 +43,9 @@ in
         ];
       };
 
-      wantedBy = [ "default.target" ];
+      wantedBy = ["default.target"];
     };
   };
 
-  meta.maintainers = with lib.maintainers; [ soopyc ];
+  meta.maintainers = with lib.maintainers; [soopyc];
 }
