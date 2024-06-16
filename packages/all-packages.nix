@@ -10,7 +10,7 @@ final: prev: let
   packages = {
     staticly = callPackage ./staticly {};
     constanze = callPackage ./constanze {};
-    nitterExperimental = callPackage ./nitter {};
+    nitterStable = callPackage ./nitter {};
   };
 in
   packages
