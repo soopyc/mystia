@@ -1,4 +1,4 @@
-# original at: https://github.com/NixOS/nixpkgs/blob/5aa53b205e895dae2c4571149ab94a79d0998863/nixos/modules/services/misc/nitter.nix
+# original at: https://github.com/NixOS/nixpkgs/blob/0a37316d6cfea44280f4470b6867a711a24606bd/nixos/modules/services/misc/nitter.nix
 {
   config,
   lib,
@@ -6,7 +6,7 @@
   ...
 }:
 with lib; let
-  cfg = config.services.nitterPatched;
+  cfg = config.services.nitterStable;
   configFile = pkgs.writeText "nitter.conf" ''
     ${generators.toINI {
         # String values need to be quoted
@@ -51,31 +51,14 @@ with lib; let
 in {
   imports = [
     # https://github.com/zedeus/nitter/pull/772
-    (mkRemovedOptionModule ["services" "nitterPatched" "replaceInstagram"] "Nitter no longer supports this option as Bibliogram has been discontinued.")
+    (mkRemovedOptionModule ["services" "nitterStable" "replaceInstagram"] "Nitter no longer supports this option as Bibliogram has been discontinued.")
   ];
 
   options = {
-    services.nitterPatched = {
-      enable = mkEnableOption (lib.mdDoc "Nitter module with patched ExecStartPre");
+    services.nitterStable = {
+      enable = mkEnableOption "Nitter";
 
-      package = mkOption {
-        default = pkgs.nitter;
-        type = types.package;
-        defaultText = literalExpression "pkgs.nitter";
-        description = lib.mdDoc "The nitter derivation to use.";
-      };
-
-      user = mkOption {
-        type = types.str;
-        default = "nitter";
-        description = lib.mdDoc "The user account that nitter is ran with.";
-      };
-
-      group = mkOption {
-        type = types.str;
-        default = "nitter";
-        description = lib.mdDoc "The group that nitter is ran with.";
-      };
+      package = mkPackageOption pkgs "nitter" {};
 
       server = {
         address = mkOption {
@@ -107,7 +90,7 @@ in {
         staticDir = mkOption {
           type = types.path;
           default = "${cfg.package}/share/nitter/public";
-          defaultText = literalExpression ''"''${config.services.nitterPatched.package}/share/nitter/public"'';
+          defaultText = literalExpression ''"''${config.services.nitterStable.package}/share/nitter/public"'';
           description = lib.mdDoc "Path to the static files directory.";
         };
 
@@ -343,20 +326,9 @@ in {
     assertions = [
       {
         assertion = !cfg.redisCreateLocally || (cfg.cache.redisHost == "localhost" && cfg.cache.redisPort == 6379);
-        message = "When services.nitterPatched.redisCreateLocally is enabled, you need to use localhost:6379 as a cache server.";
+        message = "When services.nitterStable.redisCreateLocally is enabled, you need to use localhost:6379 as a cache server.";
       }
     ];
-
-    users = {
-      users = optionalAttrs (cfg.user == "nitter") {
-        nitter = {
-          group = cfg.group;
-          isSystemUser = true;
-        };
-      };
-
-      groups = optionalAttrs (cfg.group == "nitter") {nitter = {};};
-    };
 
     systemd.services.nitter = {
       description = "Nitter (An alternative Twitter front-end)";
@@ -364,16 +336,14 @@ in {
       wants = ["network-online.target"];
       after = ["network-online.target"];
       serviceConfig = {
-        DynamicUser = false; # HACK: this is required to pass in large secrets. PR if you have a better way.
-        User = cfg.user;
-        Group = cfg.group;
+        DynamicUser = true;
         StateDirectory = "nitter";
         Environment = ["NITTER_CONF_FILE=/var/lib/nitter/nitter.conf"];
         # Some parts of Nitter expect `public` folder in working directory,
         # see https://github.com/zedeus/nitter/issues/414
         WorkingDirectory = "${cfg.package}/share/nitter";
         ExecStart = "${cfg.package}/bin/nitter";
-        ExecStartPre = ["${preStart}"];
+        ExecStartPre = "${preStart}";
         AmbientCapabilities = lib.mkIf (cfg.server.port < 1024) ["CAP_NET_BIND_SERVICE"];
         Restart = "on-failure";
         RestartSec = "5s";
