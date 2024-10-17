@@ -7,14 +7,14 @@
   cfg = config.services.arrpc;
 in {
   options.services.arrpc = {
-    enable = lib.mkEnableOption "a Discord RPC bridge for atypical setups";
+    enable = lib.mkEnableOption "arRPC, a Discord RPC bridge for atypical setups";
     package = lib.mkPackageOption pkgs "arrpc" {};
   };
 
   config = lib.mkIf cfg.enable {
     systemd.user.services.arrpc = {
       enable = true;
-      description = "Open Discord RPC bridge for atypical setups";
+      description = "Open source Discord RPC bridge for atypical setups";
       documentation = ["https://github.com/openasar/arrpc"];
 
       serviceConfig = {
@@ -43,6 +43,7 @@ in {
         ];
       };
 
+      # ideally this would be socket triggered but i cannot figure out how to pass the socket to arrpc
       wantedBy = ["default.target"];
     };
   };
