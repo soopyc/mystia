@@ -11,6 +11,7 @@ final: prev: let
     staticly = callPackage ./staticly {};
     constanze = callPackage ./constanze {};
     nitterStable = callPackage ./nitter {};
+    bsky-pds = callPackage ./bsky-pds {};
   };
 in
   packages
