@@ -7,10 +7,13 @@
 just a bunch of packages, and a sandbox for stuff that we might upstream later.
 
 ## what's inside?
+
 run `nix flake show github:soopyc/mystia`
 
 ## usage
+
 slide `github:soopyc/mystia` into your flake inputs like so
+
 ```nix
 {
   inputs = {
@@ -22,6 +25,7 @@ slide `github:soopyc/mystia` into your flake inputs like so
 ```
 
 then add inputs or just mystia to your specialArgs
+
 ```nix
 {
   nixosConfigurations = {
@@ -34,6 +38,7 @@ then add inputs or just mystia to your specialArgs
 }
 ```
 
+<!--
 and add the overlay in your nixos config
 ```nix
 { mystia, pkgs, ... }:
@@ -41,5 +46,16 @@ and add the overlay in your nixos config
   nixpkgs.overlays = [ mystia.overlays.default ];
 }
 ```
+-->
 
-cross your fingers and hope it works
+Add/use packages and modules as needed.
+
+```nix
+{mystia, ...}: {
+  imports = [
+    mystia.nixosModules.arrpc
+  ];
+}
+```
+
+cross your fingers and hope things work :3
