@@ -47,6 +47,17 @@ stdenv.mkDerivation (final: {
       cd node_modules/.pnpm/node_modules/sharp
       pnpm run install
     )
+    (
+      cd node_modules/.pnpm/node_modules/better-sqlite3
+      pnpm run build-release
+      # regular `install` has prebuild-install which does an unnecessary request to github api
+    )
+    # do we need to manually install cbor-extract here?
+    # actually we'll do it just in case
+    (
+      cd node_modules/.pnpm/node_modules/cbor-extract
+      pnpm run install
+    )
 
     pnpm i --production --frozen-lockfile
   '';
