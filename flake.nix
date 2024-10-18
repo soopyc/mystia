@@ -48,6 +48,7 @@
       fixups = import ./modules/fixups;
       vmauth = import ./modules/vmauth;
       arrpc = import ./modules/arrpc;
+      bsky-pds = import ./modules/bsky-pds;
     };
   };
 }
