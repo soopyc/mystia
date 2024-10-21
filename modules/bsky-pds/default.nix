@@ -80,7 +80,12 @@ in {
             default = "did:plc:ar7c4by46qjdydhdevvrndac";
           };
           PDS_CRAWLERS = mkOption {
-            description = "i'm going to be honest i don't know what crawlers are apart from they crawl data from PDSes... but relays also do that.";
+            description = ''
+              The relays/crawlers to use for the PDS. These essentially aggregrate data so that your data actually show
+              up in the Bluesky AppView.
+
+              Ensure websockets are properly proxied for relays to work.
+            '';
             type = types.str;
             default = "https://bsky.network";
           };
