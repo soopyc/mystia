@@ -11,17 +11,17 @@ in {
     enable = lib.mkEnableOption "Bluesky Personal Data Server (PDS)";
     package = lib.mkPackageOption pkgs "bsky-pds" {};
 
-    initSecrets = mkOption {
-      type = types.bool;
-      description = ''
-        Whether to automatically generate secrets for every required secret file not found.
-        As of now this automcatically generates secrets for the JWT secret, admin password and the PLT rotation key.
+    initSecrets =
+      lib.mkEnableOption {
+        description = ''
+          the generation of secrets for every required secret file not found.
+          As of now this automcatically generates secrets for the JWT secret, admin password and the PLT rotation key.
 
-        If you disable this option, you will have to manually generate the secrets.
-        The commands to do so are listed in the PDS installation script.
-      '';
-      default = true;
-    };
+          If you disable this option, you will have to manually generate the secrets.
+          The commands to do so are listed in the PDS installation script
+        '';
+      }
+      // {default = true;};
 
     # pds config definition
     settings = mkOption {
@@ -50,7 +50,7 @@ in {
             default = "${cfg.settings.PDS_DATA_DIRECTORY}/blocks";
           };
           PDS_BLOB_UPLOAD_LIMIT = mkOption {
-            description = "Presumably the file upload limit in bytes for the PDS.";
+            description = "The file upload limit in bytes for the PDS.";
             type = types.int;
             default = 52428800;
           };
@@ -104,7 +104,7 @@ in {
     credentials = mkOption {
       default = {};
       type = types.submodule {
-        freeformType = types.attrsOf (types.oneOf (with types; [bool int str]));
+        freeformType = types.attrsOf types.str;
         options = let
           mkFile = file: description:
             mkOption {
@@ -138,6 +138,9 @@ in {
       documentation = ["https://github.com/bluesky-social/pds"];
       environment = builtins.mapAttrs (_: builtins.toString) cfg.settings;
       # This is golfed. full form should be builtins.mapAttrs (name: value: builtins.toString value) cfg.settings.
+
+      after = ["network-online.target"];
+      wants = ["network-online.target"];
 
       preStart = lib.optionalString cfg.initSecrets ''
         set -euo pipefail
@@ -176,16 +179,14 @@ in {
       script = ''
         ##### Pre-flight check and variable loading phase #####
         ${
-          builtins.concatStringsSep "\n" (lib.forEach (lib.attrsToList cfg.credentials) ({
-            name,
-            value,
-          }: ''
-            if test ! -e ${value}; then
-              echo "Secret file for variable ${name} does not exist: ${value}"
-              exit 1
-            fi
-            export ${name}=$(cat ${value})
-          ''))
+          lib.concatLines (lib.mapAttrsToList (name: value: ''
+              if test ! -e ${value}; then
+                echo "Secret file for variable ${name} does not exist: ${value}"
+                exit 1
+              fi
+              export ${name}=$(cat ${value})
+            '')
+            cfg.credentials)
         }
 
         ##### Launch phase #####
@@ -197,7 +198,6 @@ in {
         RestartSec = 10;
 
         DynamicUser = true;
-        User = "bsky-pds";
         StateDirectory = "bsky-pds";
 
         # Hardening - not sure how many of these are superfluous.
