@@ -148,8 +148,8 @@ in {
           # systemd has checks on activation and if a credential doesn't exist the service just fails before anything is executed.
           # in this unit we only load the credentials passed by systemd.
           ${
-            lib.concatLines (lib.mapAttrsToList (name: value: ''
-                export ${name}=$(cat ''${CREDENTIALS_DIRECTORY}/${value})
+            lib.concatLines (lib.mapAttrsToList (name: _: ''
+                export ${name}=$(cat ''${CREDENTIALS_DIRECTORY}/${name})
               '')
               cfg.credentials)
           }
@@ -166,7 +166,7 @@ in {
           StateDirectory = "bsky-pds";
 
           # credentials
-          LoadCredentials = lib.mapAttrsToList (name: value: "${name}:${value}") cfg.credentials;
+          LoadCredential = lib.mapAttrsToList (name: value: "${name}:${value}") cfg.credentials;
 
           # Hardening - not sure how many of these are superfluous.
           PrivateTmp = true;
@@ -194,16 +194,19 @@ in {
         script = ''
           ##### Secret generation phase #####
           if test ! -e ${cfg.credentials.PDS_JWT_SECRET}; then
+            echo "Generating JWT secret..."
             ${lib.getExe pkgs.openssl} rand --hex 16 > '${cfg.credentials.PDS_JWT_SECRET}'
           fi
 
           if test ! -e ${cfg.credentials.PDS_ADMIN_PASSWORD}; then
+            echo "Generating Admin Password..."
             ${lib.getExe pkgs.openssl} rand --hex 16 > '${cfg.credentials.PDS_ADMIN_PASSWORD}'
           fi
 
           # this command exists as-is in the official installation script, but i'm not sure if this is just a sophisticated way of running
           # openssl rand -hex 32 and if there are other implications by doing so. i don't know anything about crypto so i will not touch this.
           if test ! -e ${cfg.credentials.PDS_PLC_ROTATION_KEY_K256_PRIVATE_KEY_HEX}; then
+            echo "Generating PLC rotation key..."
             ${lib.getExe pkgs.openssl} ecparam --name secp256k1 --genkey --noout --outform DER | \
               tail --bytes=+8 | \
               head --bytes=32 | \
