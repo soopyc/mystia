@@ -38,7 +38,6 @@ in {
             type = types.int;
             default = 2583;
           };
-          # upstream "hardcoded" this to be /pds... try configuring it to see if it breaks anything.
           PDS_DATA_DIRECTORY = mkOption {
             description = "The data storage directory of the PDS. This hosts the database and the Blobstore.";
             type = types.str;
@@ -132,94 +131,93 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.services.bsky-pds = {
-      enable = true;
-      description = "Bluesky Personal Data Server";
-      documentation = ["https://github.com/bluesky-social/pds"];
-      environment = builtins.mapAttrs (_: builtins.toString) cfg.settings;
-      # This is golfed. full form should be builtins.mapAttrs (name: value: builtins.toString value) cfg.settings.
+    systemd.services = {
+      bsky-pds = {
+        enable = true;
+        description = "Bluesky Personal Data Server";
+        documentation = ["https://github.com/bluesky-social/pds"];
+        environment = builtins.mapAttrs (_: builtins.toString) cfg.settings;
+        # This is golfed. full form should be builtins.mapAttrs (name: value: builtins.toString value) cfg.settings.
 
-      after = ["network-online.target"];
-      wants = ["network-online.target"];
+        after = ["network-online.target"] ++ lib.optionals cfg.initSecrets ["bsky-pds-secrets.service"];
+        wants = ["network-online.target"];
+        requires = lib.optionals cfg.initSecrets ["bsky-pds-secrets.service"];
 
-      preStart = lib.optionalString cfg.initSecrets ''
-        set -euo pipefail
+        script = ''
+          ##### Pre-flight check and variable loading phase #####
+          # systemd has checks on activation and if a credential doesn't exist the service just fails before anything is executed.
+          # in this unit we only load the credentials passed by systemd.
+          ${
+            lib.concatLines (lib.mapAttrsToList (name: value: ''
+                export ${name}=$(cat ''${CREDENTIALS_DIRECTORY}/${value})
+              '')
+              cfg.credentials)
+          }
 
-        fixPerms() {
-          chmod 400 $1
-        }
-        touchFile() {
-          touch $1 || true
-          chmod 600 $1
-        }
+          ##### Launch phase #####
+          ${lib.getExe cfg.package}
+        '';
 
-        ##### Secret generation phase #####
-        if test ! -e ${cfg.credentials.PDS_JWT_SECRET}; then
-          touchFile ${cfg.credentials.PDS_JWT_SECRET}
-          ${lib.getExe pkgs.openssl} rand --hex 16 > ${cfg.credentials.PDS_JWT_SECRET}
-          fixPerms ${cfg.credentials.PDS_JWT_SECRET}
-        fi
+        serviceConfig = {
+          Restart = "on-failure";
+          RestartSec = 10;
 
-        if test ! -e ${cfg.credentials.PDS_ADMIN_PASSWORD}; then
-          touchFile ${cfg.credentials.PDS_ADMIN_PASSWORD}
-          ${lib.getExe pkgs.openssl} rand --hex 16 > ${cfg.credentials.PDS_ADMIN_PASSWORD}
-          fixPerms ${cfg.credentials.PDS_ADMIN_PASSWORD}
-        fi
+          DynamicUser = true;
+          StateDirectory = "bsky-pds";
 
-        if test ! -e ${cfg.credentials.PDS_PLC_ROTATION_KEY_K256_PRIVATE_KEY_HEX}; then
-          touchFile ${cfg.credentials.PDS_PLC_ROTATION_KEY_K256_PRIVATE_KEY_HEX}
-          ${lib.getExe pkgs.openssl} ecparam --name secp256k1 --genkey --noout --outform DER | \
-            tail --bytes=+8 | \
-            head --bytes=32 | \
-            ${lib.getExe pkgs.unixtools.xxd} --plain --cols 32 > ${cfg.credentials.PDS_PLC_ROTATION_KEY_K256_PRIVATE_KEY_HEX}
-          fixPerms ${cfg.credentials.PDS_PLC_ROTATION_KEY_K256_PRIVATE_KEY_HEX}
-        fi
-      '';
+          # credentials
+          LoadCredentials = lib.mapAttrsToList (name: value: "${name}:${value}") cfg.credentials;
 
-      script = ''
-        ##### Pre-flight check and variable loading phase #####
-        ${
-          lib.concatLines (lib.mapAttrsToList (name: value: ''
-              if test ! -e ${value}; then
-                echo "Secret file for variable ${name} does not exist: ${value}"
-                exit 1
-              fi
-              export ${name}=$(cat ${value})
-            '')
-            cfg.credentials)
-        }
+          # Hardening - not sure how many of these are superfluous.
+          PrivateTmp = true;
+          PrivateUsers = true;
+          NoNewPrivileges = true;
+          RestrictSUIDSGID = true;
+          RestrictNamespaces = true;
+          CapabilityBoundingSet = null;
+          SystemCallArchitectures = "native";
+          SystemCallFilter = [
+            "@system-service"
+            "@pkey"
+            "~@privileged"
+            "~@resources"
+          ];
+          RestrictAddressFamilies = [
+            "AF_INET"
+          ];
+        };
 
-        ##### Launch phase #####
-        ${lib.getExe cfg.package}
-      '';
-
-      serviceConfig = {
-        Restart = "on-failure";
-        RestartSec = 10;
-
-        DynamicUser = true;
-        StateDirectory = "bsky-pds";
-
-        # Hardening - not sure how many of these are superfluous.
-        PrivateTmp = true;
-        PrivateUsers = true;
-        NoNewPrivileges = true;
-        RestrictSUIDSGID = true;
-        RestrictNamespaces = true;
-        CapabilityBoundingSet = null;
-        SystemCallArchitectures = "native";
-        SystemCallFilter = [
-          "@system-service"
-          "@pkey"
-          "~@privileged"
-          "~@resources"
-        ];
-        RestrictAddressFamilies = [
-          "AF_INET"
-        ];
+        wantedBy = ["multi-user.target"];
       };
 
-      wantedBy = ["multi-user.target"];
+      bsky-pds-secrets = lib.mkIf cfg.initSecrets {
+        script = ''
+          ##### Secret generation phase #####
+          if test ! -e ${cfg.credentials.PDS_JWT_SECRET}; then
+            ${lib.getExe pkgs.openssl} rand --hex 16 > '${cfg.credentials.PDS_JWT_SECRET}'
+          fi
+
+          if test ! -e ${cfg.credentials.PDS_ADMIN_PASSWORD}; then
+            ${lib.getExe pkgs.openssl} rand --hex 16 > '${cfg.credentials.PDS_ADMIN_PASSWORD}'
+          fi
+
+          # this command exists as-is in the official installation script, but i'm not sure if this is just a sophisticated way of running
+          # openssl rand -hex 32 and if there are other implications by doing so. i don't know anything about crypto so i will not touch this.
+          if test ! -e ${cfg.credentials.PDS_PLC_ROTATION_KEY_K256_PRIVATE_KEY_HEX}; then
+            ${lib.getExe pkgs.openssl} ecparam --name secp256k1 --genkey --noout --outform DER | \
+              tail --bytes=+8 | \
+              head --bytes=32 | \
+              ${lib.getExe pkgs.unixtools.xxd} --plain --cols 32 > '${cfg.credentials.PDS_PLC_ROTATION_KEY_K256_PRIVATE_KEY_HEX}'
+          fi
+        '';
+
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          DynamicUser = true;
+          StateDirectory = "bsky-pds";
+        };
+      };
     };
   };
 
