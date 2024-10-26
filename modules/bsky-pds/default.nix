@@ -3,13 +3,15 @@
   config,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) mkOption types;
   cfg = config.services.bsky-pds;
-in {
+in
+{
   options.services.bsky-pds = {
     enable = lib.mkEnableOption "Bluesky Personal Data Server (PDS)";
-    package = lib.mkPackageOption pkgs "bsky-pds" {};
+    package = lib.mkPackageOption pkgs "bsky-pds" { };
 
     initSecrets =
       lib.mkEnableOption {
@@ -21,9 +23,13 @@ in {
           The commands to do so are listed in the PDS installation script
         '';
       }
-      // {default = true;};
+      // {
+        default = true;
+      };
 
-    # this is needed to pass secrets to
+    # this is needed to pass secrets to the service, while still allowing secrets to be generated automatically.
+    # attempting to use dynamicuser caused a *lot* of headache and none properly works, without losing the automatic functionality.
+    # if anyone has a better solution please feel free to PR.
     user = mkOption {
       type = types.str;
       default = "bsky-pds";
@@ -39,7 +45,17 @@ in {
     # pds config definition
     settings = mkOption {
       type = types.submodule {
-        freeformType = types.attrsOf (types.oneOf (with types; [bool int str]));
+        freeformType = types.attrsOf (
+          types.oneOf (
+            with types;
+            [
+              bool
+              int
+              str
+            ]
+          )
+        );
+        # don't add PDS_ automatically because there are variables which do not begin with that, like LOG_ENABLE.
         options = {
           PDS_HOSTNAME = mkOption {
             description = "The hostname of the PDS.";
@@ -115,22 +131,25 @@ in {
     };
 
     credentials = mkOption {
-      default = {};
+      default = { };
       type = types.submodule {
         freeformType = types.attrsOf types.str;
-        options = let
-          mkFile = file: description:
-            mkOption {
-              type = types.str;
-              default = "${cfg.settings.PDS_DATA_DIRECTORY}/${file}";
-              defaultText = lib.literalExpression "\${settings.PDS_DATA_DIRECTORY}/${file}";
-              description = "File path for ${description}";
-            };
-        in {
-          PDS_JWT_SECRET = mkFile "jwt_key" "JWT signing secret";
-          PDS_ADMIN_PASSWORD = mkFile "admin_passwd" "PDS administrator password";
-          PDS_PLC_ROTATION_KEY_K256_PRIVATE_KEY_HEX = mkFile "plc_rotation_key" "PLC k256 hex format rotation key";
-        };
+        options =
+          let
+            mkFile =
+              file: description:
+              mkOption {
+                type = types.str;
+                default = "${cfg.settings.PDS_DATA_DIRECTORY}/${file}";
+                defaultText = lib.literalExpression "\${settings.PDS_DATA_DIRECTORY}/${file}";
+                description = "File path for ${description}";
+              };
+          in
+          {
+            PDS_JWT_SECRET = mkFile "jwt_key" "JWT signing secret";
+            PDS_ADMIN_PASSWORD = mkFile "admin_passwd" "PDS administrator password";
+            PDS_PLC_ROTATION_KEY_K256_PRIVATE_KEY_HEX = mkFile "plc_rotation_key" "PLC k256 hex format rotation key";
+          };
       };
       description = ''
         Attribute list of environment variables stored as files outside of the Nix store for security.
@@ -153,18 +172,18 @@ in {
     };
 
     users.groups = lib.mkIf (cfg.group == "bsky-pds") {
-      bsky-pds = {};
+      bsky-pds = { };
     };
 
     systemd.services.bsky-pds = {
       enable = true;
       description = "Bluesky Personal Data Server";
-      documentation = ["https://github.com/bluesky-social/pds"];
+      documentation = [ "https://github.com/bluesky-social/pds" ];
       environment = builtins.mapAttrs (_: builtins.toString) cfg.settings;
       # This is golfed. full form should be builtins.mapAttrs (name: value: builtins.toString value) cfg.settings.
 
-      after = ["network-online.target"];
-      wants = ["network-online.target"];
+      after = [ "network-online.target" ];
+      wants = [ "network-online.target" ];
 
       preStart = lib.optionalString cfg.initSecrets ''
         umask 0077
@@ -190,16 +209,15 @@ in {
         set -euo pipefail
 
         ##### Pre-flight check and variable loading phase #####
-        ${
-          lib.concatLines (lib.mapAttrsToList (name: value: ''
-              if test ! -r ${value}; then
-                echo "Secret file for variable ${name} does not exist or cannot be read: ${value}"
-                exit 1
-              fi
-              export ${name}=$(cat ${value})
-            '')
-            cfg.credentials)
-        }
+        ${lib.concatLines (
+          lib.mapAttrsToList (name: value: ''
+            if test ! -r ${value}; then
+              echo "Secret file for variable ${name} does not exist or cannot be read: ${value}"
+              exit 1
+            fi
+            export ${name}=$(cat ${value})
+          '') cfg.credentials
+        )}
 
         ##### Launch phase #####
         ${lib.getExe cfg.package}
@@ -232,9 +250,9 @@ in {
         ];
       };
 
-      wantedBy = ["multi-user.target"];
+      wantedBy = [ "multi-user.target" ];
     };
   };
 
-  meta.maintainers = with lib.maintainers; [soopyc];
+  meta.maintainers = with lib.maintainers; [ soopyc ];
 }
