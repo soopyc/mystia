@@ -23,6 +23,19 @@ in {
       }
       // {default = true;};
 
+    # this is needed to pass secrets to
+    user = mkOption {
+      type = types.str;
+      default = "bsky-pds";
+      description = "The user account under which the PDS runs.";
+    };
+
+    group = mkOption {
+      type = types.str;
+      default = "bsky-pds";
+      description = "The group under which the PDS runs.";
+    };
+
     # pds config definition
     settings = mkOption {
       type = types.submodule {
@@ -132,6 +145,17 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
+    users.users = lib.mkIf (cfg.user == "bsky-pds") {
+      bsky-pds = {
+        group = cfg.group;
+        isSystemUser = true;
+      };
+    };
+
+    users.groups = lib.mkIf (cfg.group == "bsky-pds") {
+      bsky-pds = {};
+    };
+
     systemd.services.bsky-pds = {
       enable = true;
       description = "Bluesky Personal Data Server";
@@ -143,45 +167,33 @@ in {
       wants = ["network-online.target"];
 
       preStart = lib.optionalString cfg.initSecrets ''
-        set -euo pipefail
-
-        fixPerms() {
-          chmod 400 $1
-        }
-        touchFile() {
-          touch $1 || true
-          chmod 600 $1
-        }
+        umask 0077
 
         ##### Secret generation phase #####
         if test ! -e ${cfg.credentials.PDS_JWT_SECRET}; then
-          touchFile ${cfg.credentials.PDS_JWT_SECRET}
           ${lib.getExe pkgs.openssl} rand --hex 16 > ${cfg.credentials.PDS_JWT_SECRET}
-          fixPerms ${cfg.credentials.PDS_JWT_SECRET}
         fi
 
         if test ! -e ${cfg.credentials.PDS_ADMIN_PASSWORD}; then
-          touchFile ${cfg.credentials.PDS_ADMIN_PASSWORD}
           ${lib.getExe pkgs.openssl} rand --hex 16 > ${cfg.credentials.PDS_ADMIN_PASSWORD}
-          fixPerms ${cfg.credentials.PDS_ADMIN_PASSWORD}
         fi
 
         if test ! -e ${cfg.credentials.PDS_PLC_ROTATION_KEY_K256_PRIVATE_KEY_HEX}; then
-          touchFile ${cfg.credentials.PDS_PLC_ROTATION_KEY_K256_PRIVATE_KEY_HEX}
           ${lib.getExe pkgs.openssl} ecparam --name secp256k1 --genkey --noout --outform DER | \
             tail --bytes=+8 | \
             head --bytes=32 | \
             ${lib.getExe pkgs.unixtools.xxd} --plain --cols 32 > ${cfg.credentials.PDS_PLC_ROTATION_KEY_K256_PRIVATE_KEY_HEX}
-          fixPerms ${cfg.credentials.PDS_PLC_ROTATION_KEY_K256_PRIVATE_KEY_HEX}
         fi
       '';
 
       script = ''
+        set -euo pipefail
+
         ##### Pre-flight check and variable loading phase #####
         ${
           lib.concatLines (lib.mapAttrsToList (name: value: ''
-              if test ! -e ${value}; then
-                echo "Secret file for variable ${name} does not exist: ${value}"
+              if test ! -r ${value}; then
+                echo "Secret file for variable ${name} does not exist or cannot be read: ${value}"
                 exit 1
               fi
               export ${name}=$(cat ${value})
@@ -197,7 +209,8 @@ in {
         Restart = "on-failure";
         RestartSec = 10;
 
-        DynamicUser = true;
+        User = cfg.user;
+        Group = cfg.group;
         StateDirectory = "bsky-pds";
 
         # Hardening - not sure how many of these are superfluous.
