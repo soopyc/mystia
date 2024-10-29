@@ -11,13 +11,13 @@
 }:
 stdenv.mkDerivation (final: {
   pname = "bsky-pds";
-  version = "0.4.59";
+  version = "0.4.66";
 
   src = fetchFromGitHub {
     owner = "bluesky-social";
     repo = "pds";
-    rev = "v${final.version}";
-    hash = "sha256-E4SoaLvDaHqOtZ2yExjyK6Z7Bkah6BsCFJd7cvxSwM4=";
+    rev = "87d1645a2f2e3e5d7aa96770952370f4a20178b4";
+    hash = "sha256-4YRJtFPH1O1BLmJtPwmC5ukrysURy93VLzR7tO/I/N4=";
   };
   sourceRoot = "${final.src.name}/service";
 
@@ -35,7 +35,7 @@ stdenv.mkDerivation (final: {
 
   pnpmDeps = pnpm_9.fetchDeps {
     inherit (final) pname version src sourceRoot;
-    hash = "sha256-puUVL1v372Tko8IlFM+uspuUEJgQuV49+jITTvO4OH0=";
+    hash = "sha256-szARIZtZngC/OBFqXR40ZgK+YixKyIRA+i8uZCc537M=";
   };
 
   buildPhase = ''
