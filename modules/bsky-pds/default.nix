@@ -16,7 +16,7 @@ in
     initSecrets =
       lib.mkEnableOption {
         description = ''
-          the generation of secrets for every required secret file not found.
+          the generation of secrets for every required but not found secret file.
           As of now this automcatically generates secrets for the JWT secret, admin password and the PLT rotation key.
 
           If you disable this option, you will have to manually generate the secrets.
