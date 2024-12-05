@@ -11,13 +11,13 @@
 }:
 stdenv.mkDerivation (final: {
   pname = "bsky-pds";
-  version = "0.4.67";
+  version = "0.4.74";
 
   src = fetchFromGitHub {
     owner = "bluesky-social";
     repo = "pds";
-    rev = "72e46bdbd89f6d0cb2a3433b9408c02e70733c8a";
-    hash = "sha256-dEB5u++Zx+F4TH5q44AF/tuwAhLEyYT+U5/18viT4sw=";
+    rev = "9ac9461ce2e4ed7ac66889bb1017662a2f846c98";
+    hash = "sha256-kNHsQ6funmo8bnkFBNWHQ0Fmd5nf/uh+x9buaRJMZnM=";
   };
   sourceRoot = "${final.src.name}/service";
 
@@ -35,7 +35,7 @@ stdenv.mkDerivation (final: {
 
   pnpmDeps = pnpm_9.fetchDeps {
     inherit (final) pname version src sourceRoot;
-    hash = "sha256-YvXNV8iMr85O3NlWIJnNUujUj6fCoOnlPWScLjNXowo=";
+    hash = "sha256-oU4dwlBdsMmgAUv1ICaOqaqucmg/TjKOZxjnxpm0qL8=";
   };
 
   buildPhase = ''
@@ -52,8 +52,6 @@ stdenv.mkDerivation (final: {
       pnpm run build-release
       # regular `install` has prebuild-install which does an unnecessary request to github api
     )
-    # do we need to manually install cbor-extract here?
-    # actually we'll do it just in case
     (
       cd node_modules/.pnpm/node_modules/cbor-extract
       pnpm run install
@@ -67,11 +65,11 @@ stdenv.mkDerivation (final: {
     cp -r . $out/lib/bsky-pds
     makeWrapper "${lib.getExe nodejs}" "$out/bin/bsky-pds" \
       --add-flags "$out/lib/bsky-pds/index.js" \
-      --set-default NODE_ENV production # i don't know how much this affects things
+      --set-default NODE_ENV production
   '';
 
   meta = {
-    description = "TypeScript implementation of the Bluesky personal data server";
+    description = "Official TypeScript implementation of the Bluesky personal data server";
     homepage = "https://github.com/bluesky-social/pds";
     license = with lib.licenses; [asl20 mit];
     maintainers = with lib.maintainers; [soopyc];
