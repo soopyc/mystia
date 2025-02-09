@@ -14,35 +14,24 @@
     };
   };
 
-  nixConfig = {
-    extra-substituters = [
-      "https://cache.garnix.io"
-    ];
-
-    extra-trusted-public-keys = [
-      "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
-    ];
-  };
-
   outputs = {
     self,
     nixpkgs,
+    nix-update-soopy,
     ...
-  } @ inputs: let
-    system = "x86_64-linux";
-    pkgs = import nixpkgs {
-      inherit system;
-    };
+  }: let
+    systems = ["x86_64-linux" "aarch64-linux" "x86_64-darwin"];
+    forAllSystems = fn: nixpkgs.lib.genAttrs systems (system: fn nixpkgs.legacyPackages.${system});
   in {
-    packages.${system} = import ./packages/all-packages.nix {} pkgs;
+    packages = forAllSystems (pkgs: import ./packages/all-packages.nix {} pkgs);
     overlays.default = import ./packages/all-packages.nix;
-    formatter.${system} = nixpkgs.legacyPackages.${system}.alejandra;
+    formatter = forAllSystems (pkgs: pkgs.alejandra); # FIXME: move to treefmt-nix
 
-    devShells.${system}.default = pkgs.mkShellNoCC {
-      packages = [
-        inputs.nix-update-soopy.packages.${system}.default
-      ];
-    };
+    devShells = forAllSystems (pkgs: {
+      default = pkgs.mkShellNoCC {
+        packages = [nix-update-soopy.packages.${pkgs.system}.default];
+      };
+    });
 
     nixosModules = {
       fixups = import ./modules/fixups;
