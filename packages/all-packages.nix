@@ -12,6 +12,7 @@ final: prev: let
     constanze = callPackage ./constanze {};
     nitterStable = callPackage ./nitter {};
     bsky-pds = callPackage ./bsky-pds {};
+    s3-listing = callPackage ./s3-listing {};
   };
 in
   packages
