@@ -13,6 +13,7 @@ final: prev: let
     nitterStable = callPackage ./nitter {};
     bsky-pds = callPackage ./bsky-pds {};
     s3-listing = callPackage ./s3-listing {};
+    anubis = callPackage ./anubis {};
   };
 in
   packages
