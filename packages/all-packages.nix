@@ -14,6 +14,9 @@ final: prev: let
     bsky-pds = callPackage ./bsky-pds {};
     s3-listing = callPackage ./s3-listing {};
     anubis = callPackage ./anubis {};
+
+    # fonts
+    nishiki-teki = callPackage ./fonts/nishiki-teki {};
   };
 in
   packages
