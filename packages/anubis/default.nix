@@ -23,6 +23,10 @@ buildGoModule rec {
     "-X within.website/x.Version=${version}"
   ];
 
+  postInstall = ''
+    install -vDm444 cmd/anubis/anubis@.service $out/lib/systemd/system/anubis@.service
+  '';
+
   passthru.updater = unstableGitUpdater {
     hardcodeZeroVersion = true;
   };
