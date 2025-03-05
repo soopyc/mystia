@@ -2,12 +2,12 @@
   stdenvNoCC,
   bucketName ? "unknown-bucket",
   bucketUrl ? "https://example.com",
-  bucketWebsiteUrl ? bucketUrl
+  bucketWebsiteUrl ? bucketUrl,
 }:
 
 stdenvNoCC.mkDerivation (final: {
   inherit bucketName bucketUrl bucketWebsiteUrl;
-  
+
   pname = "s3-listing";
   version = "unstable-2025-02-14";
 

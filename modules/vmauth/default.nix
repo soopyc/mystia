@@ -3,17 +3,19 @@
   config,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) mkOption types;
 
   cfg = config.services.vmauth;
-  yaml = pkgs.formats.yaml {};
-  # definition of user stuff and etc.
-  # or maybe we can just leave it out
-in {
+  yaml = pkgs.formats.yaml { };
+in
+# definition of user stuff and etc.
+# or maybe we can just leave it out
+{
   options.services.vmauth = {
     enable = lib.mkEnableOption "vmauth, an authentication proxy for VictoriaMetrics services";
-    package = lib.mkPackageOption pkgs "victoriametrics" {};
+    package = lib.mkPackageOption pkgs "victoriametrics" { };
 
     listenAddress = mkOption {
       default = "127.0.0.1:8427";
@@ -34,7 +36,7 @@ in {
     extraOptions = mkOption {
       description = "Extra CLI flags to pass to vmauth. See [the documentation](https://docs.victoriametrics.com/vmauth/#advanced-usage) or run `vmauth -help` for more information.";
       type = types.listOf types.str;
-      default = [];
+      default = [ ];
     };
 
     authConfig = mkOption {
@@ -44,16 +46,16 @@ in {
 
         As an alternative, you may use `%{ENV_VAR}` syntax along with an existing secret management tool and the `environmentFile` option.
       '';
-      type = types.submodule {freeformType = yaml.type;};
+      type = types.submodule { freeformType = yaml.type; };
     };
   };
 
   config = lib.mkIf cfg.enable {
     systemd.services.vmauth = {
       description = "vmauth - Simple authentication proxy for VictoriaMetrics components";
-      after = ["network.target"];
+      after = [ "network.target" ];
       startLimitBurst = 5;
-      wantedBy = ["multi-user.target"];
+      wantedBy = [ "multi-user.target" ];
 
       serviceConfig = {
         Restart = "on-failure";
@@ -73,5 +75,5 @@ in {
     };
   };
 
-  meta.maintainers = with lib.maintainers; [soopyc];
+  meta.maintainers = with lib.maintainers; [ soopyc ];
 }

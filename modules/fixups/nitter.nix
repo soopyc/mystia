@@ -5,30 +5,39 @@
   pkgs,
   ...
 }:
-with lib; let
+with lib;
+let
   cfg = config.services.nitterStable;
   configFile = pkgs.writeText "nitter.conf" ''
-    ${generators.toINI {
+    ${generators.toINI
+      {
         # String values need to be quoted
         mkKeyValue = generators.mkKeyValueDefault {
-          mkValueString = v:
-            if isString v
-            then "\"" + (strings.escape ["\""] (toString v)) + "\""
-            else generators.mkValueStringDefault {} v;
+          mkValueString =
+            v:
+            if isString v then
+              "\"" + (strings.escape [ "\"" ] (toString v)) + "\""
+            else
+              generators.mkValueStringDefault { } v;
         } " = ";
-      } (lib.recursiveUpdate {
+      }
+      (
+        lib.recursiveUpdate {
           Server = cfg.server;
           Cache = cfg.cache;
-          Config = cfg.config // {hmacKey = "@hmac@";};
+          Config = cfg.config // {
+            hmacKey = "@hmac@";
+          };
           Preferences = cfg.preferences;
-        }
-        cfg.settings)}
+        } cfg.settings
+      )
+    }
   '';
   # `hmac` is a secret used for cryptographic signing of video URLs.
   # Generate it on first launch, then copy configuration and replace
   # `@hmac@` with this value.
   # We are not using sed as it would leak the value in the command line.
-  preStart = pkgs.writers.writePython3 "nitter-prestart" {} ''
+  preStart = pkgs.writers.writePython3 "nitter-prestart" { } ''
     import os
     import secrets
 
@@ -48,17 +57,22 @@ with lib; let
         with open(f"{state_dir}/nitter.conf", "w") as f_out:
             f_out.write(f_in.read().replace("@hmac@", hmac))
   '';
-in {
+in
+{
   imports = [
     # https://github.com/zedeus/nitter/pull/772
-    (mkRemovedOptionModule ["services" "nitterStable" "replaceInstagram"] "Nitter no longer supports this option as Bibliogram has been discontinued.")
+    (mkRemovedOptionModule [
+      "services"
+      "nitterStable"
+      "replaceInstagram"
+    ] "Nitter no longer supports this option as Bibliogram has been discontinued.")
   ];
 
   options = {
     services.nitterStable = {
       enable = mkEnableOption "Nitter";
 
-      package = mkPackageOption pkgs "nitter" {};
+      package = mkPackageOption pkgs "nitter" { };
 
       server = {
         address = mkOption {
@@ -159,7 +173,9 @@ in {
           description = lib.mdDoc "Use base64 encoding for proxied media URLs.";
         };
 
-        enableRSS = mkEnableOption (lib.mdDoc "RSS feeds") // {default = true;};
+        enableRSS = mkEnableOption (lib.mdDoc "RSS feeds") // {
+          default = true;
+        };
 
         enableDebug = mkEnableOption (lib.mdDoc "request logs and debug endpoints");
 
@@ -299,7 +315,7 @@ in {
 
       settings = mkOption {
         type = types.attrs;
-        default = {};
+        default = { };
         description = lib.mdDoc ''
           Add settings here to override NixOS module generated settings.
 
@@ -325,34 +341,32 @@ in {
   config = mkIf cfg.enable {
     assertions = [
       {
-        assertion = !cfg.redisCreateLocally || (cfg.cache.redisHost == "localhost" && cfg.cache.redisPort == 6379);
+        assertion =
+          !cfg.redisCreateLocally || (cfg.cache.redisHost == "localhost" && cfg.cache.redisPort == 6379);
         message = "When services.nitterStable.redisCreateLocally is enabled, you need to use localhost:6379 as a cache server.";
       }
     ];
 
     systemd.services.nitter = {
       description = "Nitter (An alternative Twitter front-end)";
-      wantedBy = ["multi-user.target"];
-      wants = ["network-online.target"];
-      after = ["network-online.target"];
+      wantedBy = [ "multi-user.target" ];
+      wants = [ "network-online.target" ];
+      after = [ "network-online.target" ];
       serviceConfig = {
         DynamicUser = true;
         StateDirectory = "nitter";
-        Environment = ["NITTER_CONF_FILE=/var/lib/nitter/nitter.conf"];
+        Environment = [ "NITTER_CONF_FILE=/var/lib/nitter/nitter.conf" ];
         # Some parts of Nitter expect `public` folder in working directory,
         # see https://github.com/zedeus/nitter/issues/414
         WorkingDirectory = "${cfg.package}/share/nitter";
         ExecStart = "${cfg.package}/bin/nitter";
         ExecStartPre = "${preStart}";
-        AmbientCapabilities = lib.mkIf (cfg.server.port < 1024) ["CAP_NET_BIND_SERVICE"];
+        AmbientCapabilities = lib.mkIf (cfg.server.port < 1024) [ "CAP_NET_BIND_SERVICE" ];
         Restart = "on-failure";
         RestartSec = "5s";
         # Hardening
-        CapabilityBoundingSet =
-          if (cfg.server.port < 1024)
-          then ["CAP_NET_BIND_SERVICE"]
-          else [""];
-        DeviceAllow = [""];
+        CapabilityBoundingSet = if (cfg.server.port < 1024) then [ "CAP_NET_BIND_SERVICE" ] else [ "" ];
+        DeviceAllow = [ "" ];
         LockPersonality = true;
         MemoryDenyWriteExecute = true;
         PrivateDevices = true;
@@ -368,12 +382,19 @@ in {
         ProtectKernelModules = true;
         ProtectKernelTunables = true;
         ProtectProc = "invisible";
-        RestrictAddressFamilies = ["AF_INET" "AF_INET6"];
+        RestrictAddressFamilies = [
+          "AF_INET"
+          "AF_INET6"
+        ];
         RestrictNamespaces = true;
         RestrictRealtime = true;
         RestrictSUIDSGID = true;
         SystemCallArchitectures = "native";
-        SystemCallFilter = ["@system-service" "~@privileged" "~@resources"];
+        SystemCallFilter = [
+          "@system-service"
+          "~@privileged"
+          "~@resources"
+        ];
         UMask = "0077";
       };
     };
@@ -384,7 +405,7 @@ in {
     };
 
     networking.firewall = mkIf cfg.openFirewall {
-      allowedTCPPorts = [cfg.server.port];
+      allowedTCPPorts = [ cfg.server.port ];
     };
   };
 }

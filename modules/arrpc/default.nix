@@ -3,19 +3,21 @@
   config,
   pkgs,
   ...
-}: let
+}:
+let
   cfg = config.services.arrpc;
-in {
+in
+{
   options.services.arrpc = {
     enable = lib.mkEnableOption "arRPC, a Discord RPC bridge for atypical setups";
-    package = lib.mkPackageOption pkgs "arrpc" {};
+    package = lib.mkPackageOption pkgs "arrpc" { };
   };
 
   config = lib.mkIf cfg.enable {
     systemd.user.services.arrpc = {
       enable = true;
       description = "Open source Discord RPC bridge for atypical setups";
-      documentation = ["https://github.com/openasar/arrpc"];
+      documentation = [ "https://github.com/openasar/arrpc" ];
 
       serviceConfig = {
         ExecStart = lib.getExe cfg.package;
@@ -44,9 +46,9 @@ in {
       };
 
       # ideally this would be socket triggered but i cannot figure out how to pass the socket to arrpc
-      wantedBy = ["default.target"];
+      wantedBy = [ "default.target" ];
     };
   };
 
-  meta.maintainers = with lib.maintainers; [soopyc];
+  meta.maintainers = with lib.maintainers; [ soopyc ];
 }

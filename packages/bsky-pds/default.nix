@@ -34,7 +34,12 @@ stdenv.mkDerivation (final: {
   ];
 
   pnpmDeps = pnpm_8.fetchDeps {
-    inherit (final) pname version src sourceRoot;
+    inherit (final)
+      pname
+      version
+      src
+      sourceRoot
+      ;
     hash = "sha256-JaZ7PVQttuqiU+fltB4/sW/2euePhq12RqsV8gqeUSc=";
   };
 
@@ -71,8 +76,11 @@ stdenv.mkDerivation (final: {
   meta = {
     description = "Official TypeScript implementation of the Bluesky personal data server";
     homepage = "https://github.com/bluesky-social/pds";
-    license = with lib.licenses; [asl20 mit];
-    maintainers = with lib.maintainers; [soopyc];
+    license = with lib.licenses; [
+      asl20
+      mit
+    ];
+    maintainers = with lib.maintainers; [ soopyc ];
 
     mainProgram = "bsky-pds";
   };

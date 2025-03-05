@@ -1,4 +1,4 @@
-{stdenvNoCC}:
+{ stdenvNoCC }:
 stdenvNoCC.mkDerivation {
   name = "staticly";
   src = ./src;

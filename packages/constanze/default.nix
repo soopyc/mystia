@@ -19,6 +19,6 @@ buildGoModule {
   meta = {
     description = "Simple CLI tool to tinker with akkoma instances";
     homepage = "https://akkoma.dev/AkkomaGang/constanze";
-    maintainers = with lib.maintainers; [soopyc];
+    maintainers = with lib.maintainers; [ soopyc ];
   };
 }

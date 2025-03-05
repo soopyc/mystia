@@ -13,7 +13,7 @@ stdenvNoCC.mkDerivation (final: {
     # mirrored for versioning.
     url = "https://assets.soopy.moe/mirror/nishiki-teki-v${final.version}.zip";
     hash = "sha256-szKrHLUSm6z/31eneJxMYYig9MyUrwVyRUiR46PP8MI=";
-    stripRoot=false;
+    stripRoot = false;
   };
 
   buildPhase = ''

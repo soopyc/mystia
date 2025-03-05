@@ -1,6 +1,7 @@
 # Shamefully copied from https://github.com/getchoo/nix-exprs/commit/584fab5b00d5d6016ba11a30c8e31a6314a5ce65
 # and https://github.com/Scrumplex/pkgs/blob/d85a96f9d697baea9127fe20611c500c7b83b1d2/pkgs/all-packages.nix
-final: prev: let
+final: prev:
+let
   callPackage = final.callPackage or (prev.lib.callPackageWith (prev // packages));
   # pkgs =
   #   if (final != {})
@@ -8,15 +9,15 @@ final: prev: let
   #   else prev;
 
   packages = {
-    staticly = callPackage ./staticly {};
-    constanze = callPackage ./constanze {};
-    nitterStable = callPackage ./nitter {};
-    bsky-pds = callPackage ./bsky-pds {};
-    s3-listing = callPackage ./s3-listing {};
-    anubis = callPackage ./anubis {};
+    staticly = callPackage ./staticly { };
+    constanze = callPackage ./constanze { };
+    nitterStable = callPackage ./nitter { };
+    bsky-pds = callPackage ./bsky-pds { };
+    s3-listing = callPackage ./s3-listing { };
+    anubis = callPackage ./anubis { };
 
     # fonts
-    nishiki-teki = callPackage ./fonts/nishiki-teki {};
+    nishiki-teki = callPackage ./fonts/nishiki-teki { };
   };
 in
-  packages
+packages
