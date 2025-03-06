@@ -14,15 +14,13 @@ in
     package = lib.mkPackageOption pkgs "bsky-pds" { };
 
     initSecrets =
-      lib.mkEnableOption {
-        description = ''
-          the generation of secrets for every required but not found secret file.
-          As of now this automcatically generates secrets for the JWT secret, admin password and the PLT rotation key.
+      (lib.mkEnableOption ''
+        the generation of secrets for every required but not found secret file.
+        As of now this automcatically generates secrets for the JWT secret, admin password and the PLT rotation key.
 
-          If you disable this option, you will have to manually generate the secrets.
-          The commands to do so are listed in the PDS installation script
-        '';
-      }
+        If you disable this option, you will have to manually generate the secrets.
+        The commands to do so are listed in the PDS installation script
+      '')
       // {
         default = true;
       };
