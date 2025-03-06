@@ -63,6 +63,7 @@
         vmauth = import ./modules/vmauth;
         arrpc = import ./modules/arrpc;
         bsky-pds = import ./modules/bsky-pds;
+        anubis = import ./modules/anubis self;
       };
     };
 }
