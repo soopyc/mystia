@@ -65,5 +65,11 @@
         bsky-pds = import ./modules/bsky-pds;
         anubis = import ./modules/anubis self;
       };
+
+      nixosTests = forAllSystems (pkgs: {
+        anubis = pkgs.callPackage ./tests/anubis.nix { } {
+          module = self.nixosModules.anubis;
+        };
+      });
     };
 }
