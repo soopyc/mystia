@@ -17,6 +17,12 @@
       url = "github:edolstra/flake-compat";
       flake = false;
     };
+
+    # extern
+    anubis-unix = {
+      url = "github:soopyc/anubis-unix";
+      flake = false;
+    };
   };
 
   outputs =
@@ -26,7 +32,7 @@
       treefmt-nix,
       nix-update-soopy,
       ...
-    }:
+    }@inputs:
     let
       systems = [
         "x86_64-linux"
@@ -38,8 +44,8 @@
       treefmtEval = forAllSystems (pkgs: treefmt-nix.lib.evalModule pkgs ./treefmt.nix);
     in
     {
-      packages = forAllSystems (pkgs: import ./packages/all-packages.nix { } pkgs);
-      overlays.default = import ./packages/all-packages.nix;
+      packages = forAllSystems (pkgs: import ./packages/all-packages.nix inputs { } pkgs);
+      overlays.default = import ./packages/all-packages.nix inputs;
 
       formatter = forAllSystems (pkgs: treefmtEval.${pkgs.system}.config.build.wrapper);
       checks = forAllSystems (pkgs: {
