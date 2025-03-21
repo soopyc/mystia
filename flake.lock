@@ -3,11 +3,11 @@
     "anubis-unix": {
       "flake": false,
       "locked": {
-        "lastModified": 1742530678,
-        "narHash": "sha256-rCg1g3+a/sQSoYkAy6wWdsd8ylWjvTqQFMVTAoCt3TI=",
+        "lastModified": 1742537349,
+        "narHash": "sha256-peHfLwpU3EiQsWK3/o/58YI+JNNrPTPEB6uGX1Jo3sU=",
         "owner": "soopyc",
         "repo": "anubis-unix",
-        "rev": "43c4c8c6552355c9834abb57e05004f5b06d7e2a",
+        "rev": "3671b9a62c404e6cdc6ba69ce970d5f3a315374b",
         "type": "github"
       },
       "original": {
