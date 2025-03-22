@@ -15,7 +15,6 @@ let
   commonSubmodule =
     isDefault:
     let
-      # "mkOptionWithPotentialDefaults" but it's too long
       mkDefaultOption =
         path: opts:
         lib.mkOption (
@@ -29,7 +28,7 @@ let
     { name, ... }:
     {
       options = {
-        enable = lib.mkEnableOption "enable this instance" // {
+        enable = lib.mkEnableOption "enable this instance of Anubis" // {
           default = true;
         };
         user = mkDefaultOption "user" {
@@ -52,20 +51,17 @@ let
         botPolicy = lib.mkOption {
           default = null;
           description = ''
-            Anubis bot policy configuration. Set to `null` to use the baked-in policy which should be sufficient for
-            most use-cases.
+            Anubis policy configuration in Nix syntax. Set to `null` to use the baked-in policy which should be
+            sufficient for most use-cases.
 
-            Has no effect if `settings.POLICY_FNAME` is set to a different value.
+            Has no effect if `settings.POLICY_FNAME` is set to a different value, useful for importing an existing
+            configuration.
 
-            See [upstream docs](https://github.com/Xe/x/blob/4755ba2b524f50f634a186ea5440ed2d6daa868e/cmd/anubis/docs/policies.md)
-            for details.
+            See [the documentation](https://anubis.techaro.lol/docs/admin/policies) for details.
           '';
-          type = types.nullOr (
-            types.submodule {
-              freeformType = jsonFormat.type;
-            }
-          );
+          type = types.nullOr jsonFormat.type;
         };
+
         extraFlags = mkDefaultOption "extraFlags" {
           default = [ ];
           description = "A list of extra flags to be passed to Anubis.";
@@ -78,8 +74,8 @@ let
           description = ''
             Freeform configuration via environment variables for Anubis.
 
-            See [upstream documentation](https://github.com/Xe/x/blob/4755ba2b524f50f634a186ea5440ed2d6daa868e/cmd/anubis/README.md#setting-up-anubis)
-            for a complete list of configuration options.
+            See [the documentation](https://anubis.techaro.lol/docs/admin/installation) for a complete list of
+            available environment variables.
           '';
           type = types.submodule ([
             {
@@ -91,34 +87,24 @@ let
                 BIND_NETWORK = mkDefaultOption "settings.BIND_NETWORK" {
                   default = "unix";
                   description = ''
-                    The network type that Anubis should listen to.
+                    The network family that Anubis should listen to.
 
-                    Known values are listed explicitly but other values may be used as long as it is supported by Go.
+                    Accepts anything supported by Go's [`net.Listen`](https://pkg.go.dev/net#Listen). Common values are
+                    `tcp` and `unix`.
                   '';
                   example = "tcp";
-                  type = types.oneOf [
-                    (types.enum [
-                      "tcp"
-                      "unix"
-                    ])
-                    types.str
-                  ]; # for documentation
+                  type = types.str;
                 };
                 METRICS_BIND_NETWORK = mkDefaultOption "settings.METRICS_BIND_NETWORK" {
                   default = "unix";
                   description = ''
-                    The network type that the metrics server should listen to.
+                    The network family that the metrics server should listen to.
 
-                    Known values are listed explicitly but other values may be used as long as it is supported by Go.
+                    Accepts anything supported by Go's [`net.Listen`](https://pkg.go.dev/net#Listen). Common values are
+                    `tcp` and `unix`.
                   '';
                   example = "tcp";
-                  type = types.oneOf [
-                    (types.enum [
-                      "tcp"
-                      "unix"
-                    ])
-                    types.str
-                  ]; # for documentation
+                  type = types.str;
                 };
                 SOCKET_MODE = mkDefaultOption "settings.SOCKET_MODE" {
                   default = "0770";
@@ -127,7 +113,7 @@ let
                   type = types.str;
                 };
                 DIFFICULTY = mkDefaultOption "settings.DIFFICULTY" {
-                  default = 5;
+                  default = 4;
                   description = ''
                     The difficulty required for clients to solve the challenge.
 
@@ -167,7 +153,7 @@ let
       BIND = lib.mkOption {
         default = "/run/anubis/anubis-${name}.sock";
         description = ''
-          The address Anubis listens to, see Go's [net.Listen](https://pkg.go.dev/net#Listen) for syntax.
+          The address that Anubis listens to, see Go's [`net.Listen`](https://pkg.go.dev/net#Listen) for syntax.
 
           Defaults to Unix domain sockets. To use TCP sockets, set this to a TCP address and BIND_NETWORK to `"tcp"`.
         '';
@@ -177,18 +163,20 @@ let
       METRICS_BIND = lib.mkOption {
         default = "/run/anubis/anubis-${name}-metrics.sock";
         description = ''
-          The address Anubis' metrics server should listen to, see Go's [net.Listen](https://pkg.go.dev/net#Listen) for
-          syntax.
+          The address Anubis' metrics server should listen to, see Go's [`net.Listen`](https://pkg.go.dev/net#Listen)
+          for syntax.
 
           Defaults to Unix domain sockets. To use TCP sockets, set this to a TCP address and BIND_NETWORK to `"tcp"`.
         '';
-        example = ":8081";
+        example = "127.0.0.1:8081";
         type = types.str;
-        # technically this can be disabled but flagenv/whatever ignores empty envs, so only possible by setting a flag.
+        # this can be disabled but flagenv ignores empty envs, so only possible by setting a flag.
       };
       TARGET = lib.mkOption {
         description = ''
           The reverse proxy target that Anubis is in front of. This is a required option.
+
+          Unix domain sockets are also supported using this syntax: `unix:///path/to/socket.sock`
         '';
         example = "http://127.0.0.1:8000";
         type = types.str;
@@ -202,7 +190,7 @@ in
 
     createDefaultUser =
       lib.mkEnableOption ''
-        create a default Anubis user.
+        create a default Anubis user `anubis`, required if using Unix domain sockets due to permissions.
 
         This only takes effect if at least one Anubis instance is defined and enabled
       ''
@@ -226,8 +214,9 @@ in
   config = lib.mkIf (enabledInstances != { }) {
     assertions = [
       {
+        # there is currently no special handling for "", and that results in funky socket names like `anubis-.sock`
         assertion = !lib.any (name: name == "") (builtins.attrNames enabledInstances);
-        message = "All Anubis instances must have a name, for example `default`";
+        message = "All Anubis instances must have a non-empty name, for example `default`.";
       }
     ];
 
@@ -271,6 +260,36 @@ in
               "anubis"
             else
               null;
+
+          # hardening
+          NoNewPrivileges = true;
+          CapabilityBoundingSet = null;
+          SystemCallFilter = [
+            "@system-service"
+            "~@privileged"
+          ];
+          SystemCallArchitectures = "native";
+          MemoryDenyWriteExecute = true;
+
+          PrivateUsers = true;
+          PrivateTmp = true;
+          PrivateDevices = true;
+          ProtectHome = true;
+          ProtectClock = true;
+          ProtectHostname = true;
+          ProtectKernelLogs = true;
+          ProtectKernelModules = true;
+          ProtectKernelTunables = true;
+          ProtectProc = "invisible";
+          ProtectSystem = "strict";
+          LockPersonality = true;
+          RestrictSUIDSGID = true;
+          RestrictNamespaces = true;
+          RestrictAddressFamilies = [
+            "AF_UNIX"
+            "AF_INET"
+            "AF_INET6"
+          ];
         };
       }
     ) enabledInstances;
