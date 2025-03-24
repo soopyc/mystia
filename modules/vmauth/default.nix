@@ -1,3 +1,4 @@
+_:
 {
   lib,
   config,
