@@ -20,12 +20,17 @@ testers.runNixOSTest {
       services.anubis.instances = {
         "default".settings.TARGET = "http://localhost:8080";
 
-        "tcp".settings = {
-          TARGET = "http://localhost:8080";
-          BIND = ":9000";
-          BIND_NETWORK = "tcp";
-          METRICS_BIND = ":9001";
-          METRICS_BIND_NETWORK = "tcp";
+        "tcp" = {
+          user = null;
+          group = null;
+          dynamicUser = true;
+          settings = {
+            TARGET = "http://localhost:8080";
+            BIND = ":9000";
+            BIND_NETWORK = "tcp";
+            METRICS_BIND = ":9001";
+            METRICS_BIND_NETWORK = "tcp";
+          };
         };
 
         "unix-upstream" = {
@@ -40,12 +45,18 @@ testers.runNixOSTest {
         enable = true;
         recommendedProxySettings = true;
         virtualHosts."basic.localhost".locations = {
-          # http://unix:/run/anubis/anubis-default.sock
           "/".proxyPass = "http://unix:${config.services.anubis.instances.default.settings.BIND}";
-
-          # http://unix:/run/anubis/anubis-default-metrics.sock
           "/metrics".proxyPass =
             "http://unix:${config.services.anubis.instances.default.settings.METRICS_BIND}";
+        };
+
+        virtualHosts."tcp.localhost".locations = {
+          "/".proxyPass = "http://localhost:9000";
+          "/metrics".proxyPass = "http://localhost:9001";
+        };
+
+        virtualHosts."unix.localhost".locations = {
+          "/".proxyPass = "http://unix:${config.services.anubis.instances.unix-upstream.settings.BIND}";
         };
 
         # emulate an upstream with nginx, listening on tcp and unix sockets.
@@ -82,10 +93,10 @@ testers.runNixOSTest {
     machine.succeed('curl -f -X POST http://basic.localhost/.within.website/x/cmd/anubis/api/make-challenge | grep challenge')
 
     # TCP mode
-    machine.succeed('curl -f localhost:9000 -H "User-Agent: Mozilla" | grep anubis')
-    machine.succeed('curl -f localhost:9001/metrics | grep anubis_challenges_issued')
+    machine.succeed('curl -f http://tcp.localhost -H "User-Agent: Mozilla" | grep anubis')
+    machine.succeed('curl -f http://tcp.localhost/metrics | grep anubis_challenges_issued')
 
     # Upstream is a unix socket mode
-    machine.succeed('curl -f --unix-socket /run/anubis/anubis-unix-upstream.sock http://upstream.localhost/index.html | grep "it works"')
+    machine.succeed('curl -f http://unix.localhost/index.html | grep "it works"')
   '';
 }
