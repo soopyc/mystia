@@ -34,6 +34,7 @@
       ...
     }@inputs:
     let
+      inherit (nixpkgs) lib;
       systems = [
         "x86_64-linux"
         "aarch64-linux"
@@ -59,11 +60,11 @@
       });
 
       nixosModules = {
-        fixups = import ./modules/fixups;
-        vmauth = import ./modules/vmauth;
-        arrpc = import ./modules/arrpc;
-        bsky-pds = import ./modules/bsky-pds;
-        anubis = import ./modules/anubis self;
+        fixups = lib.modules.importApply ./modules/fixups { };
+        vmauth = lib.modules.importApply ./modules/vmauth { };
+        arrpc = lib.modules.importApply ./modules/arrpc { };
+        bsky-pds = lib.modules.importApply ./modules/bsky-pds { };
+        anubis = lib.modules.importApply ./modules/anubis { inherit self; };
       };
 
       nixosTests = forAllSystems (pkgs: {
