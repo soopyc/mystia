@@ -12,7 +12,12 @@ let
     nitterStable = callPackage ./nitter { };
     bsky-pds = callPackage ./bsky-pds { };
     s3-listing = callPackage ./s3-listing { };
-    anubis = callPackage ./anubis { };
+    anubis =
+      lib.warn
+        "mystia: the anubis package is now tracking unstable `main` branch commits. you probably want to use the nixpkgs package instead."
+        callPackage
+        ./anubis
+        { };
 
     # fonts
     nishiki-teki = callPackage ./fonts/nishiki-teki { };

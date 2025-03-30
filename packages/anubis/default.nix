@@ -1,42 +1,84 @@
 {
   lib,
-  buildGoModule,
+  stdenv,
+  buildGo124Module,
   fetchFromGitHub,
-  unstableGitUpdater,
+  fetchNpmDeps,
+  nix-update-script,
+  # asset build-time dependencies
+  nodejs,
+  npmHooks,
+  esbuild,
+  gzip,
+  zstd,
+  brotli,
 }:
-
-buildGoModule rec {
+buildGo124Module (finalAttrs: {
   pname = "anubis";
-  version = "0-unstable-2025-03-03";
+  version = "1.15.0-unstable-2025-03-30";
 
   src = fetchFromGitHub {
-    owner = "Xe";
-    repo = "x";
-    rev = "19f0d3d0c1b171ebc25176f777d034ffaa98a4be";
-    hash = "sha256-9AcNjxy33FOpgSaVVYGfLkl+r6aV0L9+ouyHUoFOW5U=";
+    owner = "TecharoHQ";
+    repo = "anubis";
+    rev = "c896c63a0b8a917eef6be958a5cdcef6a4a48d61";
+    hash = "sha256-mPPYopQAT5oLA0F3IsRh0RPFSk/UpDuzCZtq47IZtns=";
   };
 
-  subPackages = [ "cmd/anubis" ];
-  vendorHash = "sha256-V/SrgBMZkw9lM+hCM+/5AQKZ3/iTY9kI5Lj+Ch9/Sbc=";
+  env.npmDeps = fetchNpmDeps {
+    inherit (finalAttrs) src;
+    hash = "sha256-P7qJWyBhqsDf51j8ctYdWbR0NiNF3GvNiW18BagTGQA=";
+  };
 
-  ldflags = [
-    "-X within.website/x.Version=${version}"
+  vendorHash = "sha256-Rcra5cu7zxGm2LhL2x9Kd3j/uQaEb8OOh/j5Rhh8S1k=";
+
+  subPackages = [
+    "cmd/anubis"
   ];
 
-  postInstall = ''
-    install -vDm444 cmd/anubis/anubis@.service $out/lib/systemd/system/anubis@.service
+  ldflags =
+    [
+      "-s"
+      "-w"
+      "-X=github.com/TecharoHQ/anubis.Version=v${finalAttrs.version}"
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isLinux [
+      "-extldflags=-static"
+    ];
+
+  nativeBuildInputs = [
+    esbuild
+    gzip
+    zstd
+    brotli
+    nodejs
+    npmHooks.npmConfigHook
+  ];
+
+  overrideModAttrs = lib.const {
+    # avoid building assets when only vendoring the deps
+    preBuild = "";
+  };
+
+  preBuild = ''
+    patchShebangs --build web xess
+    npm run assets
   '';
 
-  passthru.updater = unstableGitUpdater {
-    hardcodeZeroVersion = true;
-  };
+  preCheck = ''
+    export DONT_USE_NETWORK=1
+  '';
+
+  passthru.updateScript = nix-update-script { };
 
   meta = {
-    description = "HTTP connection soul-weighing PoW challenge proxy";
-    homepage = "https://github.com/Xe/x/blob/master/cmd/anubis/README.md";
-    licenses = with lib.licenses; [ cc0 ];
-
-    maintainers = with lib; [ soopyc ];
+    description = "Weighs the soul of incoming HTTP requests using proof-of-work to stop AI crawlers";
+    homepage = "https://github.com/TecharoHQ/anubis/";
+    changelog = "https://github.com/TecharoHQ/anubis/releases/tag/v${finalAttrs.version}";
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [
+      knightpp
+      soopyc
+    ];
     mainProgram = "anubis";
   };
-}
+})
