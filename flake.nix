@@ -17,12 +17,6 @@
       url = "github:edolstra/flake-compat";
       flake = false;
     };
-
-    # extern
-    anubis-unix = {
-      url = "github:soopyc/anubis-unix";
-      flake = false;
-    };
   };
 
   outputs =

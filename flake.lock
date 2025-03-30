@@ -1,21 +1,5 @@
 {
   "nodes": {
-    "anubis-unix": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1742668919,
-        "narHash": "sha256-VdzfBACkL7Dge0NPgbPSPK5v5F2/vQI+2vYOTSaE5Fk=",
-        "owner": "soopyc",
-        "repo": "anubis-unix",
-        "rev": "801f290a1ecd45353a4be65ef108cf6201af431a",
-        "type": "github"
-      },
-      "original": {
-        "owner": "soopyc",
-        "repo": "anubis-unix",
-        "type": "github"
-      }
-    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -92,7 +76,6 @@
     },
     "root": {
       "inputs": {
-        "anubis-unix": "anubis-unix",
         "flake-compat": "flake-compat",
         "nix-update-soopy": "nix-update-soopy",
         "nixpkgs": "nixpkgs",

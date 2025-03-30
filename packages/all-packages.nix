@@ -3,10 +3,8 @@
 self: final: prev:
 let
   callPackage = final.callPackage or (prev.lib.callPackageWith (prev // packages));
-  # pkgs =
-  #   if (final != {})
-  #   then final
-  #   else prev;
+  pkgs = if (final != { }) then final else prev;
+  lib = pkgs.lib;
 
   packages = {
     staticly = callPackage ./staticly { };
@@ -20,7 +18,7 @@ let
     nishiki-teki = callPackage ./fonts/nishiki-teki { };
 
     # extern
-    anubis-unix = callPackage self.anubis-unix { };
+    anubis-unix = lib.warn "mystia: the anubis-unix package is removed since all functionality was merged to upstream. please use the package in nixpkgs instead." pkgs.anubis;
   };
 in
 packages
