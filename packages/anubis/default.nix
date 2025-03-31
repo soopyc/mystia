@@ -15,13 +15,13 @@
 }:
 buildGo124Module (finalAttrs: {
   pname = "anubis";
-  version = "1.15.0-unstable-2025-03-30";
+  version = "1.15.0-unstable-2025-03-31";
 
   src = fetchFromGitHub {
     owner = "TecharoHQ";
     repo = "anubis";
-    rev = "c896c63a0b8a917eef6be958a5cdcef6a4a48d61";
-    hash = "sha256-mPPYopQAT5oLA0F3IsRh0RPFSk/UpDuzCZtq47IZtns=";
+    rev = "28828a2e93de32e758b62107f0af0a429b911b90";
+    hash = "sha256-+zYj/8JLQDm+zSaY8IFguOQX/r22hrvrnTzL3p4+n+M=";
   };
 
   env.npmDeps = fetchNpmDeps {
