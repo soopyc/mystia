@@ -11,6 +11,7 @@ let
 
   cfg = config.services.anubis;
   enabledInstances = lib.filterAttrs (_: conf: conf.enable) cfg.instances;
+  instanceName = name: if name == "" then "anubis" else "anubis-${name}";
 
   commonSubmodule =
     isDefault:
@@ -31,24 +32,28 @@ let
     { name, ... }:
     {
       options = {
-        enable = lib.mkEnableOption "enable this instance of Anubis" // {
+        enable = lib.mkEnableOption "this instance of Anubis" // {
           default = true;
         };
         user = mkDefaultOption "user" {
           default = "anubis";
-          description = "The user under which Anubis is run.";
-          type = types.nullOr types.str;
+          description = ''
+            The user under which Anubis is run.
+
+            This module utilizes systemd's DynamicUser feature. See the corresponding section in
+            {manpage}`systemd.exec(5)` for more details.
+          '';
+          type = types.str;
         };
         group = mkDefaultOption "group" {
           default = "anubis";
-          description = "The group under which Anubis is run.";
-          type = types.nullOr types.str;
-        };
-        dynamicUser = mkDefaultOption "dynamicUser" {
-          default = false;
-          description = "Whether to run Anubis with DynamicUser.";
-          example = true;
-          type = types.bool;
+          description = ''
+            The group under which Anubis is run.
+
+            This module utilizes systemd's DynamicUser feature. See the corresponding section in
+            {manpage}`systemd.exec(5)` for more details.
+          '';
+          type = types.str;
         };
 
         botPolicy = lib.mkOption {
@@ -68,7 +73,7 @@ let
         extraFlags = mkDefaultOption "extraFlags" {
           default = [ ];
           description = "A list of extra flags to be passed to Anubis.";
-          example = [ "-metrics-bind ''" ];
+          example = [ "-metrics-bind \"\"" ];
           type = types.listOf types.str;
         };
 
@@ -97,7 +102,7 @@ let
                 BIND_NETWORK = mkDefaultOption "settings.BIND_NETWORK" {
                   default = "unix";
                   description = ''
-                    The network family that Anubis should listen to.
+                    The network family that Anubis should bind to.
 
                     Accepts anything supported by Go's [`net.Listen`](https://pkg.go.dev/net#Listen).
 
@@ -109,7 +114,7 @@ let
                 METRICS_BIND_NETWORK = mkDefaultOption "settings.METRICS_BIND_NETWORK" {
                   default = "unix";
                   description = ''
-                    The network family that the metrics server should listen to.
+                    The network family that the metrics server should bind to.
 
                     Accepts anything supported by Go's [`net.Listen`](https://pkg.go.dev/net#Listen).
 
@@ -137,8 +142,8 @@ let
                 SERVE_ROBOTS_TXT = mkDefaultOption "settings.SERVE_ROBOTS_TXT" {
                   default = false;
                   description = ''
-                    Whether to serve a default robots.txt that denys access to common AI bots by name and all other bots
-                    by wildcard.
+                    Whether to serve a default robots.txt that denies access to common AI bots by name and all other
+                    bots by wildcard.
                   '';
                   type = types.bool;
                 };
@@ -147,8 +152,8 @@ let
                 POLICY_FNAME = mkDefaultOption "settings.POLICY_FNAME" {
                   default = null;
                   description = ''
-                    The bot policy file to use. Leave this as `null` to respect the
-                    {option}`services.anubis.instances.<name>.botPolicy` option.
+                    The bot policy file to use. Leave this as `null` to respect the value set in
+                    {option}`services.anubis.instances.<name>.botPolicy`.
                   '';
                   type = types.nullOr types.path;
                 };
@@ -164,9 +169,9 @@ let
     options = {
       # see other options above
       BIND = lib.mkOption {
-        default = "/run/anubis/anubis-${name}.sock";
+        default = "/run/anubis/${instanceName name}.sock";
         description = ''
-          The address that Anubis listens to, see Go's [`net.Listen`](https://pkg.go.dev/net#Listen) for syntax.
+          The address that Anubis listens to. See Go's [`net.Listen`](https://pkg.go.dev/net#Listen) for syntax.
 
           Defaults to Unix domain sockets. To use TCP sockets, set this to a TCP address and `BIND_NETWORK` to `"tcp"`.
         '';
@@ -174,10 +179,10 @@ let
         type = types.str;
       };
       METRICS_BIND = lib.mkOption {
-        default = "/run/anubis/anubis-${name}-metrics.sock";
+        default = "/run/anubis/${instanceName name}-metrics.sock";
         description = ''
-          The address Anubis' metrics server should listen to, see Go's [`net.Listen`](https://pkg.go.dev/net#Listen)
-          for syntax.
+          The address Anubis' metrics server listens to. See Go's [`net.Listen`](https://pkg.go.dev/net#Listen) for
+          syntax.
 
           The metrics server is enabled by default and may be disabled. However, due to implementation details, this is
           only possible by setting a command line flag. See {option}`services.anubis.defaultOptions.extraFlags` for an
@@ -193,7 +198,7 @@ let
         description = ''
           The reverse proxy target that Anubis is protecting. This is a required option.
 
-          Unix domain sockets are also supported by the following syntax: `unix:///path/to/socket.sock`.
+          The usage of Unix domain sockets is supported by the following syntax: `unix:///path/to/socket.sock`.
         '';
         example = "http://127.0.0.1:8000";
         type = types.str;
@@ -205,63 +210,40 @@ in
   options.services.anubis = {
     package = lib.mkPackageOption self.packages.${pkgs.system} "anubis-unix" { };
 
-    # not using mkEnableOption because it adds a space between the last word and the period with multi-line strings.
-    createDefaultUser = lib.mkOption {
-      default = true;
-      description = ''
-        Whether to create a default Anubis user `anubis`. A dedicated user is required if using Unix domain sockets due
-        to permissions.
-
-        This only takes effect if at least one Anubis instance is defined and enabled.
-      '';
-      type = types.bool;
-      example = false;
-    };
-
     defaultOptions = lib.mkOption {
       default = { };
-      description = "Default options for all instances of Anubis, unless overridden.";
+      description = "Default options for all instances of Anubis.";
       type = types.submodule (commonSubmodule true);
     };
 
     instances = lib.mkOption {
       default = { };
-      description = "An attribute set of Anubis instances. The attribute name must not be empty.";
+      description = ''
+        An attribute set of Anubis instances.
+
+        The attribute name may be an empty string, in which case the `-<name>` suffix is not added to the service name
+        and socket paths.
+      '';
       type = types.attrsOf (types.submodule (commonSubmodule false));
     };
   };
 
   config = lib.mkIf (enabledInstances != { }) {
-    assertions = [
-      {
-        # there is currently no special handling for "", and that results in funky socket names like `anubis-.sock`
-        assertion = lib.all (name: name != "") (lib.attrNames enabledInstances);
-        message = "All Anubis instances must have a non-empty name, for example `default`.";
-      }
-
-      {
-        assertion = lib.all (value: value.user == null -> value.dynamicUser) (
-          lib.attrValues enabledInstances
-        );
-        message = ''
-          One or more Anubis instances have `user` set to `null` but `dynamicUser` is not enabled.
-          This is dangerous as Anubis will run as the root user, and is very likely a configuration error.
-        '';
-      }
-    ];
-
-    users = lib.mkIf cfg.createDefaultUser {
-      users.anubis = {
+    users.users = lib.mkIf (cfg.defaultOptions.user == "anubis") {
+      anubis = {
         isSystemUser = true;
-        group = "anubis";
+        group = cfg.defaultOptions.group;
       };
-      groups.anubis = { };
+    };
+
+    users.groups = lib.mkIf (cfg.defaultOptions.group == "anubis") {
+      anubis = { };
     };
 
     systemd.services = lib.mapAttrs' (
       name: instance:
-      lib.nameValuePair "anubis-${name}" {
-        description = "Anubis (${name} instance)";
+      lib.nameValuePair "${instanceName name}" {
+        description = "Anubis (${if name == "" then "default" else name} instance)";
         wantedBy = [ "multi-user.target" ];
         after = [ "network-online.target" ];
         wants = [ "network-online.target" ];
@@ -273,7 +255,8 @@ in
         serviceConfig = {
           User = instance.user;
           Group = instance.group;
-          DynamicUser = instance.dynamicUser;
+          DynamicUser = true;
+
           ExecStart = lib.concatStringsSep " " (
             (lib.singleton (lib.getExe cfg.package)) ++ instance.extraFlags
           );

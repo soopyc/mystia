@@ -3,7 +3,7 @@
 { module }:
 
 testers.runNixOSTest {
-  name = "anubis-basic";
+  name = "anubis";
 
   defaults = {
     imports = [ module ];
@@ -12,18 +12,16 @@ testers.runNixOSTest {
   nodes.machine =
     {
       config,
-      lib,
       pkgs,
       ...
     }:
     {
       services.anubis.instances = {
-        "default".settings.TARGET = "http://localhost:8080";
+        "".settings.TARGET = "http://localhost:8080";
 
         "tcp" = {
-          user = null;
-          group = null;
-          dynamicUser = true;
+          user = "anubis-tcp";
+          group = "anubis-tcp";
           settings = {
             TARGET = "http://localhost:8080";
             BIND = ":9000";
@@ -45,9 +43,8 @@ testers.runNixOSTest {
         enable = true;
         recommendedProxySettings = true;
         virtualHosts."basic.localhost".locations = {
-          "/".proxyPass = "http://unix:${config.services.anubis.instances.default.settings.BIND}";
-          "/metrics".proxyPass =
-            "http://unix:${config.services.anubis.instances.default.settings.METRICS_BIND}";
+          "/".proxyPass = "http://unix:${config.services.anubis.instances."".settings.BIND}";
+          "/metrics".proxyPass = "http://unix:${config.services.anubis.instances."".settings.METRICS_BIND}";
         };
 
         virtualHosts."tcp.localhost".locations = {
@@ -81,10 +78,15 @@ testers.runNixOSTest {
     };
 
   testScript = ''
-    machine.wait_for_unit("nginx.service")
-    machine.wait_for_unit("anubis-default.service")
-    machine.wait_for_unit("anubis-tcp.service")
-    machine.wait_for_unit("anubis-unix-upstream.service")
+    for unit in ["nginx", "anubis", "anubis-tcp", "anubis-unix-upstream"]:
+      machine.wait_for_unit(unit + ".service")
+
+    for port in [9000, 9001]:
+      machine.wait_for_open_port(port)
+
+    for instance in ["anubis", "anubis-unix-upstream"]:
+      machine.wait_for_open_unix_socket(f"/run/anubis/{instance}.sock")
+      machine.wait_for_open_unix_socket(f"/run/anubis/{instance}-metrics.sock")
 
     # Default unix socket mode
     machine.succeed('curl -f http://basic.localhost | grep "it works"')
