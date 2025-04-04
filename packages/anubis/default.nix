@@ -4,7 +4,7 @@
   buildGo124Module,
   fetchFromGitHub,
   fetchNpmDeps,
-  nix-update-script,
+  unstableGitUpdater,
   # asset build-time dependencies
   nodejs,
   npmHooks,
@@ -15,18 +15,18 @@
 }:
 buildGo124Module (finalAttrs: {
   pname = "anubis";
-  version = "1.15.0-unstable-2025-03-31";
+  version = "1.15.2-unstable-2025-04-03";
 
   src = fetchFromGitHub {
     owner = "TecharoHQ";
     repo = "anubis";
-    rev = "28828a2e93de32e758b62107f0af0a429b911b90";
-    hash = "sha256-+zYj/8JLQDm+zSaY8IFguOQX/r22hrvrnTzL3p4+n+M=";
+    rev = "a230a58a1d6d11d50846c6f788d3c04a42f2c6ce";
+    hash = "sha256-573sYGUJHarlafImX3lhiyPvhse9gqa/02BsuKJwV6Q=";
   };
 
   env.npmDeps = fetchNpmDeps {
     inherit (finalAttrs) src;
-    hash = "sha256-P7qJWyBhqsDf51j8ctYdWbR0NiNF3GvNiW18BagTGQA=";
+    hash = "sha256-QrW0grgNRZRum2mCec86Za1UV4R5QSRlhjVYFsZDwY8=";
   };
 
   vendorHash = "sha256-Rcra5cu7zxGm2LhL2x9Kd3j/uQaEb8OOh/j5Rhh8S1k=";
@@ -68,7 +68,7 @@ buildGo124Module (finalAttrs: {
     export DONT_USE_NETWORK=1
   '';
 
-  passthru.updateScript = nix-update-script { };
+  passthru.updateScript = unstableGitUpdater { };
 
   meta = {
     description = "Weighs the soul of incoming HTTP requests using proof-of-work to stop AI crawlers";
