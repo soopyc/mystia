@@ -15,21 +15,23 @@
 }:
 buildGo124Module (finalAttrs: {
   pname = "anubis";
-  version = "1.15.2-unstable-2025-04-03";
+  version = "1.18.0-unstable-2025-05-22";
+
+  # TODO: update this to match upstream
 
   src = fetchFromGitHub {
     owner = "TecharoHQ";
     repo = "anubis";
-    rev = "a230a58a1d6d11d50846c6f788d3c04a42f2c6ce";
-    hash = "sha256-573sYGUJHarlafImX3lhiyPvhse9gqa/02BsuKJwV6Q=";
+    rev = "c78d830ecb28b0bc56bce2da4541634dec24b3a0";
+    hash = "sha256-gIjAHXjWG2aP+bNMKT9+HmWho26pc/q0KOpptvIPgE0=";
   };
 
   env.npmDeps = fetchNpmDeps {
     inherit (finalAttrs) src;
-    hash = "sha256-QrW0grgNRZRum2mCec86Za1UV4R5QSRlhjVYFsZDwY8=";
+    hash = "sha256-dJrOzSe3RWhtF76BTqm3tevzycvjdHO8gIEUW8mXi4Y=";
   };
 
-  vendorHash = "sha256-Rcra5cu7zxGm2LhL2x9Kd3j/uQaEb8OOh/j5Rhh8S1k=";
+  vendorHash = "sha256-iIzeyiQrFJCcld0DfpJ9uhCQBCMyRGtEU/sjU6e6FYQ=";
 
   subPackages = [
     "cmd/anubis"
