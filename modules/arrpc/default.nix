@@ -15,6 +15,8 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    warnings = lib.singleton "[mystia] the arrpc nixos module is not maintained as of 2025-06-04.";
+
     systemd.user.services.arrpc = {
       enable = true;
       description = "Open source Discord RPC bridge for atypical setups";
