@@ -9,7 +9,7 @@ let
   packages = {
     staticly = callPackage ./staticly { };
     constanze = callPackage ./constanze { };
-    nitterStable = callPackage ./nitter { };
+    nitterStable = lib.warn "mystia: the nitterStable package is unmaintained and deprecated. please use the package in nixpkgs instead." pkgs.nitter;
     bsky-pds = callPackage ./bsky-pds { };
     s3-listing = callPackage ./s3-listing { };
     anubis =
