@@ -14,10 +14,8 @@ let
     s3-listing = callPackage ./s3-listing { };
     anubis =
       lib.warn
-        "mystia: the anubis package is now tracking unstable `main` branch commits. you probably want to use the nixpkgs package instead."
-        callPackage
-        ./anubis
-        { };
+        "mystia: due to maintenance burden, anubis is now dropped from mystia. sorry. please switch to the upstream nixpkgs package instead."
+        pkgs.anubis;
 
     # fonts
     nishiki-teki = callPackage ./fonts/nishiki-teki { };
