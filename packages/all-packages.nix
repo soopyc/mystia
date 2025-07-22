@@ -12,10 +12,7 @@ let
     nitterStable = lib.warn "mystia: the nitterStable package is unmaintained and deprecated. please use the package in nixpkgs instead." pkgs.nitter;
     bsky-pds = callPackage ./bsky-pds { };
     s3-listing = callPackage ./s3-listing { };
-    anubis =
-      lib.warn
-        "mystia: due to maintenance burden, anubis is now dropped from mystia. sorry. please switch to the upstream nixpkgs package instead."
-        pkgs.anubis;
+    anubis = lib.warn "mystia: due to maintenance burden, anubis is now dropped from mystia. sorry. please switch to the upstream nixpkgs package instead." pkgs.anubis;
 
     # fonts
     nishiki-teki = callPackage ./fonts/nishiki-teki { };

@@ -35,7 +35,8 @@
         search = nuscht-search.packages.${system}.mkSearch {
           modules = [
             { _module.args.pkgs = nixpgks.legacyPackages.${system}; }
-          ] ++ builtins.attrValues main.nixosModules;
+          ]
+          ++ builtins.attrValues main.nixosModules;
           urlPrefix = "https://github.com/soopyc/mystia/blob/master/";
         };
       });
