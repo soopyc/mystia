@@ -41,7 +41,7 @@ stdenv.mkDerivation (final: {
       sourceRoot
       ;
     fetcherVersion = 2;
-    hash = "sha256-XPSwIN3364SFpi5ITkGHzfImjla44W4M0CVd9ASG9Ec=";
+    hash = "sha256-d23Q7NgZfDHxhjBjlEP4eEymdJUd45yIBeVN7DAdb60=";
   };
 
   buildPhase = ''
