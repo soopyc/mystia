@@ -58,6 +58,7 @@
         vmauth = lib.modules.importApply ./modules/vmauth { };
         arrpc = lib.modules.importApply ./modules/arrpc { };
         bsky-pds = lib.modules.importApply ./modules/bsky-pds { };
+        mautrix-discord = lib.modules.importApply ./modules/mautrix-discord.nix {};
         anubis = lib.modules.importApply ./modules/anubis { inherit self; };
       };
 
