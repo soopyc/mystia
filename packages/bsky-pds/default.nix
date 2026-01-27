@@ -2,22 +2,24 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  nodejs,
+  nodejs_20,
   pnpm_8,
   vips,
   python311,
   pkg-config,
   makeWrapper,
+  fetchPnpmDeps,
+  pnpmConfigHook,
 }:
 stdenv.mkDerivation (final: {
   pname = "bsky-pds";
-  version = "0.4.193";
+  version = "0.4.204";
 
   src = fetchFromGitHub {
     owner = "bluesky-social";
     repo = "pds";
-    rev = "fbae8ba718ceecdc38921200411e8e0fc5de3aae";
-    hash = "sha256-2KYOdtvh4lOcLDcXJLunUcC2itJtmYLGIww3XZvW1VY=";
+    rev = "ab53b2464d2cd24eaf8a25397f19c54b71bd6a2e";
+    hash = "sha256-jYCMwHKKFIsfOgGYiKVrWtIT7atPA8NsetvfjDW05yE=";
   };
   sourceRoot = "${final.src.name}/service";
 
@@ -26,28 +28,30 @@ stdenv.mkDerivation (final: {
   ];
 
   nativeBuildInputs = [
-    nodejs
-    pnpm_8.configHook
+    nodejs_20
+    pnpm_8
     makeWrapper
+    pnpmConfigHook
     python311 # sharp
     pkg-config # sharp
   ];
 
-  pnpmDeps = pnpm_8.fetchDeps {
+  pnpmDeps = fetchPnpmDeps {
     inherit (final)
       pname
       version
       src
       sourceRoot
       ;
+    pnpm = pnpm_8;
     fetcherVersion = 2;
-    hash = "sha256-RZ8HPDT91ATuCUMR0iIUjwlGn9FGvCnbXT0gH2jW7+U=";
+    hash = "sha256-huBuxj+NGdigD+y4dKkBzyVKLruQWa4xecr1WwZ+WVw=";
   };
 
   buildPhase = ''
     # https://github.com/NixOS/nixpkgs/pull/296697/files#r1617595593
     # maybe instead of this hack we can just use nixpkgs' node-gyp instead?
-    export npm_config_nodedir=${nodejs}
+    export npm_config_nodedir=${nodejs_20}
     # we need to run this because pnpmDeps doesn't run scripts.
     (
       cd node_modules/.pnpm/node_modules/sharp
@@ -58,10 +62,6 @@ stdenv.mkDerivation (final: {
       pnpm run build-release
       # regular `install` has prebuild-install which does an unnecessary request to github api
     )
-    (
-      cd node_modules/.pnpm/node_modules/cbor-extract
-      pnpm run install
-    )
 
     pnpm i --production --frozen-lockfile
   '';
@@ -69,7 +69,7 @@ stdenv.mkDerivation (final: {
   installPhase = ''
     mkdir -p $out/lib/bsky-pds
     cp -r . $out/lib/bsky-pds
-    makeWrapper "${lib.getExe nodejs}" "$out/bin/bsky-pds" \
+    makeWrapper "${lib.getExe nodejs_20}" "$out/bin/bsky-pds" \
       --add-flags "$out/lib/bsky-pds/index.js" \
       --set-default NODE_ENV production
   '';
