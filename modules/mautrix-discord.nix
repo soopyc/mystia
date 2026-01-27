@@ -1,3 +1,6 @@
+# mautrix-discord but outputs json instead of yaml.
+# modified from https://github.com/NixOS/nixpkgs/blob/a165ec5812397c678bf9c029bda5fabb9225d304/nixos/modules/services/matrix/mautrix-discord.nix
+
 _:
 {
   lib,
@@ -548,17 +551,12 @@ in
         restartTriggers = [ settingsFileUnformatted ];
       };
     };
+  };
 
-    meta = {
-      description = ''
-        mautrix-discord but outputs json instead of yaml.
-
-        modified from https://github.com/NixOS/nixpkgs/blob/a165ec5812397c678bf9c029bda5fabb9225d304/nixos/modules/services/matrix/mautrix-discord.nix
-      '';
-      maintainers = with lib.maintainers; [
-        mistyttm
-        soopyc
-      ];
-    };
+  meta = {
+    maintainers = with lib.maintainers; [
+      mistyttm
+      soopyc
+    ];
   };
 }
