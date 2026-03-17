@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # ratchet:actions/checkout@v4
 
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v12
+        uses: NixOS/nix-installer-action@228d8a956062db04221c97c2794ea443194824aa # ratchet:NixOS/nix-installer-action@main
         with:
           extra-conf: |
             fallback = true
@@ -21,16 +21,16 @@ jobs:
             experimental-features = nix-command flakes
 
       - name: Update flake.lock
-        uses: DeterminateSystems/update-flake-lock@v23
+        uses: DeterminateSystems/update-flake-lock@834c491b2ece4de0bbd00d85214bb5e83b4da5c6 # ratchet:DeterminateSystems/update-flake-lock@v28
         with:
           pr-title: "flake: update lockfile"
           pr-labels: |
             dependencies
             automated
-          git-author-name: soopyc [bot]
-          git-author-email: ci_signing+github@ningenkai.soopy.moe
-          git-committer-name: soopyc [bot]
-          git-committer-email: ci_signing+github@ningenkai.soopy.moe
+          git-author-name: soopynet automated worker
+          git-author-email: ci_signing@services.soopy.moe
+          git-committer-name: soopynet automated worker
+          git-committer-email: ci_signing@services.soopy.moe
 
           sign-commits: true
           gpg-fingerprint: ${{ vars.GPG_FINGERPRINT }}

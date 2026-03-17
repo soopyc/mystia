@@ -7,7 +7,7 @@ pull_request_rules:
       - "#check-failure = 0"
       - "#check-skipped = 0"
       - "#check-pending = 0"
-      - "commits[*].email_author = ci_signing+github@ningenkai.soopy.moe"
+      - "commits[*].email_author = ci_signing@services.soopy.moe"
       - "label=automated"
       - "label=dependencies"
     actions:
