@@ -4,36 +4,30 @@
   fetchFromGitHub,
   nodejs_20,
   pnpm_8,
-  vips,
   python311,
-  pkg-config,
   makeWrapper,
   fetchPnpmDeps,
   pnpmConfigHook,
 }:
 stdenv.mkDerivation (final: {
   pname = "bsky-pds";
-  version = "0.4.204";
+  version = "0.4.219";
 
   src = fetchFromGitHub {
     owner = "bluesky-social";
     repo = "pds";
-    rev = "ab53b2464d2cd24eaf8a25397f19c54b71bd6a2e";
-    hash = "sha256-jYCMwHKKFIsfOgGYiKVrWtIT7atPA8NsetvfjDW05yE=";
+    rev = "c5099a7a0c633cc89c8677176d9c9ccfc92bd885";
+    hash = "sha256-zXNg1rtXN9qdTBvRlSiPlRu6k1Pv3T8nhROsEarev5U=";
   };
   sourceRoot = "${final.src.name}/service";
-
-  buildInputs = [
-    vips # sharp
-  ];
 
   nativeBuildInputs = [
     nodejs_20
     pnpm_8
     makeWrapper
     pnpmConfigHook
-    python311 # sharp
-    pkg-config # sharp
+    python311 # node-gyp
+    # pkg-config # node-gyp?
   ];
 
   pnpmDeps = fetchPnpmDeps {
@@ -45,7 +39,7 @@ stdenv.mkDerivation (final: {
       ;
     pnpm = pnpm_8;
     fetcherVersion = 2;
-    hash = "sha256-huBuxj+NGdigD+y4dKkBzyVKLruQWa4xecr1WwZ+WVw=";
+    hash = "sha256-y0bqWcE10g+6TzKyj0rheRCXDmSfsDPKh82ZeEWuYmE=";
   };
 
   buildPhase = ''
@@ -53,10 +47,6 @@ stdenv.mkDerivation (final: {
     # maybe instead of this hack we can just use nixpkgs' node-gyp instead?
     export npm_config_nodedir=${nodejs_20}
     # we need to run this because pnpmDeps doesn't run scripts.
-    (
-      cd node_modules/.pnpm/node_modules/sharp
-      pnpm run install
-    )
     (
       cd node_modules/.pnpm/node_modules/better-sqlite3
       pnpm run build-release
