@@ -16,6 +16,7 @@ let
 
     # fonts
     nishiki-teki = callPackage ./fonts/nishiki-teki { };
+    maple-soopy = callPackage ./fonts/maple-soopy { };
 
     # extern
     anubis-unix = lib.warn "mystia: the anubis-unix package is removed since all functionality was merged to upstream. please use the package in nixpkgs instead." pkgs.anubis;
