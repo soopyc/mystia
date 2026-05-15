@@ -13,6 +13,7 @@ let
     bsky-pds = callPackage ./bsky-pds { };
     s3-listing = callPackage ./s3-listing { };
     anubis = lib.warn "mystia: due to maintenance burden, anubis is now dropped from mystia. sorry. please switch to the upstream nixpkgs package instead." pkgs.anubis;
+    c3extractor = callPackage ./c3extractor { };
 
     # fonts
     nishiki-teki = callPackage ./fonts/nishiki-teki { };
