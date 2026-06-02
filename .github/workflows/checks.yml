@@ -1,0 +1,33 @@
+name: "Check Packages"
+
+on:
+  push:
+  pull_request:
+    branches:
+      - "mistress"
+
+jobs:
+  checks:
+    name: "Checks"
+
+    runs-on:
+      # slim doesn't have enough memory i think
+      - "ubuntu-24.04" # linux-x86_64
+      # - "ubuntu-24.04-arm" # linux-aarch64
+      # - "macos-latest"     # darwin-aarch64
+
+    steps:
+      - name: "Checkout Repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # ratchet:actions/checkout@v6
+
+      - name: "Configure Nix"
+        uses: "NixOS/nix-installer-action@6b8548fe06acfb0155a50ab5d561accb215764cc" # ratchet:NixOS/nix-installer-action@main
+        with:
+          extra-conf: |
+            experimental-features = nix-command flakes
+
+      - name: "Build Packages"
+        run: |
+          nix develop --command \
+            nix-fast-build --flake .#packages --no-nom
+
