@@ -1,4 +1,0 @@
-builds:
-  include:
-  - '*.x86_64-linux.*'
-  - 'nixosTests.x86_64-linux.*'
