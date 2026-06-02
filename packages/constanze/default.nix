@@ -1,19 +1,21 @@
 {
   lib,
   buildGoModule,
-  fetchFromGitea,
+  fetchFromForgejo,
 }:
 buildGoModule {
   pname = "constanze";
-  version = "0.0.1-372b8ec";
+  version = "2025-10-05+65312f2";
 
   vendorHash = "sha256-6C3OTAKAgZFeCteQpKVdC2gY18bzJST951QL2HnoGkM=";
-  src = fetchFromGitea {
+  src = fetchFromForgejo {
     domain = "akkoma.dev";
     owner = "AkkomaGang";
     repo = "constanze";
-    rev = "372b8ec304447133f1c7d6cdee44fc6a09a51440";
-    hash = "sha256-LGkff92PaOj+0ZyFDr0FCuZ2w1hbD++OQxHSPbm3W88=";
+    rev = "65312f2a4e08c7f636a1f0bd4d093e8e80f3b469";
+    hash = "sha256-z+XdqHY2dJi2VoCOv2iIfCRMifY0ffHxS/zJTWFYuLg=";
+
+    forceFetchGit = true; # tarball retrieval is flaky
   };
 
   meta = {
