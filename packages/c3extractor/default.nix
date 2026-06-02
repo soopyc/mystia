@@ -44,4 +44,3 @@ stdenv.mkDerivation (final: {
     mainProgram = "c3extractor";
   };
 })
-
