@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  nodejs_20,
+  nodejs_24,
   pnpm_8,
   python311,
   makeWrapper,
@@ -16,13 +16,13 @@ stdenv.mkDerivation (final: {
   src = fetchFromGitHub {
     owner = "bluesky-social";
     repo = "pds";
-    rev = "c5099a7a0c633cc89c8677176d9c9ccfc92bd885";
-    hash = "sha256-zXNg1rtXN9qdTBvRlSiPlRu6k1Pv3T8nhROsEarev5U=";
+    rev = "eb46a2e156e8e18709de6dfa6beae09c330e1eeb";
+    hash = "sha256-j7XNZYZHHj5HdtEuTAhNU9TD7S7eMILMflZJn0nDVaY=";
   };
   sourceRoot = "${final.src.name}/service";
 
   nativeBuildInputs = [
-    nodejs_20
+    nodejs_24
     pnpm_8
     makeWrapper
     pnpmConfigHook
@@ -38,14 +38,14 @@ stdenv.mkDerivation (final: {
       sourceRoot
       ;
     pnpm = pnpm_8;
-    fetcherVersion = 2;
-    hash = "sha256-y0bqWcE10g+6TzKyj0rheRCXDmSfsDPKh82ZeEWuYmE=";
+    fetcherVersion = 3;
+    hash = "sha256-2HlqgsihpKV2U+KRRsAqVRaiRHmUZXdXCIpESSHz+3s=";
   };
 
   buildPhase = ''
     # https://github.com/NixOS/nixpkgs/pull/296697/files#r1617595593
     # maybe instead of this hack we can just use nixpkgs' node-gyp instead?
-    export npm_config_nodedir=${nodejs_20}
+    export npm_config_nodedir=${nodejs_24}
     # we need to run this because pnpmDeps doesn't run scripts.
     (
       cd node_modules/.pnpm/node_modules/better-sqlite3
@@ -59,8 +59,8 @@ stdenv.mkDerivation (final: {
   installPhase = ''
     mkdir -p $out/lib/bsky-pds
     cp -r . $out/lib/bsky-pds
-    makeWrapper "${lib.getExe nodejs_20}" "$out/bin/bsky-pds" \
-      --add-flags "$out/lib/bsky-pds/index.js" \
+    makeWrapper "${lib.getExe nodejs_24}" "$out/bin/bsky-pds" \
+      --add-flags "$out/lib/bsky-pds/index.ts" \
       --set-default NODE_ENV production
   '';
 
