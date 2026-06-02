@@ -2,7 +2,7 @@
   description = "Just a bunch of packages";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-unstable";
+    nixpkgs.url = "nixpkgs/nixos-26.05";
 
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
