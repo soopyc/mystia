@@ -208,7 +208,7 @@ let
 in
 {
   options.services.anubis = {
-    package = lib.mkPackageOption self.packages.${pkgs.system} "anubis" { };
+    package = lib.mkPackageOption self.packages.${pkgs.stdenv.hostPlatform.system} "anubis" { };
 
     defaultOptions = lib.mkOption {
       default = { };
