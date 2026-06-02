@@ -33,6 +33,7 @@
         "x86_64-linux"
         "aarch64-linux"
         "x86_64-darwin"
+        "aarch64-darwin"
       ];
       forAllSystems =
         fn:
@@ -62,7 +63,12 @@
         { pkgs, system }:
         {
           default = pkgs.mkShellNoCC {
-            packages = [ nix-update-soopy.packages.${system}.default ];
+            packages = [
+              nix-update-soopy.packages.${system}.default
+
+              pkgs.nix-fast-build
+              pkgs.ratchet
+            ];
           };
         }
       );
