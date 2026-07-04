@@ -110,7 +110,7 @@ in
           LockPersonality = true;
           MemoryDenyWriteExecute = true;
           PrivateDevices = true;
-          PrivateUsers = true; # TODO: set to false if it breaks CAP_NET_BIND_SERVICE
+          PrivateUsers = false; # TODO: set to false if it breaks CAP_NET_BIND_SERVICE
           PrivateTmp = true;
           ProtectClock = true;
           ProtectProc = "invisible"; # kinda implies ProcSubset?
