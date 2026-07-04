@@ -80,6 +80,7 @@
         bsky-pds = lib.modules.importApply ./modules/bsky-pds { };
         mautrix-discord = lib.modules.importApply ./modules/mautrix-discord.nix { };
         anubis = lib.modules.importApply ./modules/anubis { inherit self; };
+        stalwart-minimal = lib.modules.importApply ./modules/stalwart-minimal.nix;
       };
 
       nixosTests = forAllSystems (
