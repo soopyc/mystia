@@ -3,7 +3,7 @@
   stdenv,
   fetchFromGitHub,
   nodejs_24,
-  pnpm_8,
+  pnpm_10,
   python311,
   makeWrapper,
   fetchPnpmDeps,
@@ -11,19 +11,20 @@
 }:
 stdenv.mkDerivation (final: {
   pname = "bsky-pds";
-  version = "0.4.219";
+  version = "0.5.9"; # 0.4.5009
+  # upstream versioning is like this to accomodate their (arguably terrible) auto-update legacy code
 
   src = fetchFromGitHub {
     owner = "bluesky-social";
     repo = "pds";
-    rev = "eb46a2e156e8e18709de6dfa6beae09c330e1eeb";
-    hash = "sha256-j7XNZYZHHj5HdtEuTAhNU9TD7S7eMILMflZJn0nDVaY=";
+    rev = "f8de5f08900c42023b01a4d10995556f16d05145";
+    hash = "sha256-PLNKUmEPgYmDDzYYWQvMKPq82RI96exQyAsfamZa2SE=";
   };
   sourceRoot = "${final.src.name}/service";
 
   nativeBuildInputs = [
     nodejs_24
-    pnpm_8
+    pnpm_10
     makeWrapper
     pnpmConfigHook
     python311 # node-gyp
@@ -37,9 +38,9 @@ stdenv.mkDerivation (final: {
       src
       sourceRoot
       ;
-    pnpm = pnpm_8;
+    pnpm = pnpm_10;
     fetcherVersion = 3;
-    hash = "sha256-2HlqgsihpKV2U+KRRsAqVRaiRHmUZXdXCIpESSHz+3s=";
+    hash = "sha256-9dxW05u5LmTiEluqoNfQQ7NqjcLAFYOqsfOZKv1ud2I=";
   };
 
   buildPhase = ''
