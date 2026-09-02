@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  nodejs_24,
+  nodejs_22, # FIXME: nodejs 24 issue with ffi with better-sqlite3
   pnpm_10,
   python311,
   makeWrapper,
@@ -23,7 +23,7 @@ stdenv.mkDerivation (final: {
   sourceRoot = "${final.src.name}/service";
 
   nativeBuildInputs = [
-    nodejs_24
+    nodejs_22
     pnpm_10
     makeWrapper
     pnpmConfigHook
@@ -46,7 +46,7 @@ stdenv.mkDerivation (final: {
   buildPhase = ''
     # https://github.com/NixOS/nixpkgs/pull/296697/files#r1617595593
     # maybe instead of this hack we can just use nixpkgs' node-gyp instead?
-    export npm_config_nodedir=${nodejs_24}
+    export npm_config_nodedir=${nodejs_22}
     # we need to run this because pnpmDeps doesn't run scripts.
     (
       cd node_modules/.pnpm/node_modules/better-sqlite3
@@ -60,7 +60,7 @@ stdenv.mkDerivation (final: {
   installPhase = ''
     mkdir -p $out/lib/bsky-pds
     cp -r . $out/lib/bsky-pds
-    makeWrapper "${lib.getExe nodejs_24}" "$out/bin/bsky-pds" \
+    makeWrapper "${lib.getExe nodejs_22}" "$out/bin/bsky-pds" \
       --add-flags "$out/lib/bsky-pds/index.ts" \
       --set-default NODE_ENV production
   '';
