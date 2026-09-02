@@ -11,14 +11,14 @@
 }:
 stdenv.mkDerivation (final: {
   pname = "bsky-pds";
-  version = "0.5.9"; # 0.4.5009
+  version = "0.5.27+edc4e8b"; # 0.4.5027
   # upstream versioning is like this to accomodate their (arguably terrible) auto-update legacy code
 
   src = fetchFromGitHub {
     owner = "bluesky-social";
     repo = "pds";
-    rev = "f8de5f08900c42023b01a4d10995556f16d05145";
-    hash = "sha256-PLNKUmEPgYmDDzYYWQvMKPq82RI96exQyAsfamZa2SE=";
+    rev = "edc4e8b2875cf577df036d512f3008fa2b1eca1c";
+    hash = "sha256-LZoLKjWedxnorfaoNoM5363tSzOpphU/f+u/vOkhlKA=";
   };
   sourceRoot = "${final.src.name}/service";
 
@@ -40,7 +40,7 @@ stdenv.mkDerivation (final: {
       ;
     pnpm = pnpm_10;
     fetcherVersion = 3;
-    hash = "sha256-9dxW05u5LmTiEluqoNfQQ7NqjcLAFYOqsfOZKv1ud2I=";
+    hash = "sha256-a6hnQXPK0+mhOnvlDwOdSiyjpXZ6oB+j9HG/bh9I9D0=";
   };
 
   buildPhase = ''
