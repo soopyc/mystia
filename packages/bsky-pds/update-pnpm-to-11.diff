@@ -1,0 +1,21 @@
+diff --git a/service/package.json b/service/package.json
+index 4532ce3..a3e9e01 100644
+--- a/service/package.json
++++ b/service/package.json
+@@ -4,7 +4,7 @@
+   "version": "0.0.0",
+   "type": "module",
+   "description": "Service entrypoint for atproto personal data server",
+-  "packageManager": "pnpm@10.34.1",
++  "packageManager": "pnpm@11.27.0",
+   "main": "index.ts",
+   "license": "MIT",
+   "dependencies": {
+diff --git a/service/pnpm-workspace.yaml b/service/pnpm-workspace.yaml
+new file mode 100644
+index 0000000..65783dc
+--- /dev/null
++++ b/service/pnpm-workspace.yaml
+@@ -0,0 +1,2 @@
++allowBuilds:
++  better-sqlite3: true
